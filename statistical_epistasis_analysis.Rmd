@@ -1,0 +1,446 @@
+---
+title: "statistical_analysis_epistasis"
+output: html_document
+---
+
+```{r, setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "C:/Users/karol/OneDrive - The University Of British Columbia (1)/PhD/Epistasis_Lit/Bulk/Output")
+
+library(tidyverse)
+library(ggExtra)
+library(ggrepel)
+```
+
+## Fold-Change Data
+
+Here we look at the fold-change data used in the input files. This allows us to see positive and negative functional effects across the landscapes.
+
+```{r, message = F}
+fit_land = do.call("rbind", lapply(list.files(pattern="observed_values.csv", recursive = T), read_csv, skip = 1, col_names = c("id", "effect", "muts", "2", "3", "enz"))) %>% select(-c('2', '3'))
+```
+
+The data shows the following distribution
+
+```{r}
+c(sum(fit_land$effect < log10(1/1.5)), sum(fit_land$effect >= log10(1/1.5) & fit_land$effect <= log10(1.5)), sum(fit_land$effect > log10(1.5)))
+```
+
+### Histogram
+
+```{r}
+fit_land %>%
+  ggplot(aes(x = effect, fill = enz)) +
+  geom_histogram(bins = 100, alpha = 0.8) +
+  geom_vline(xintercept = log10(1.5), lty = 2) +
+  geom_vline(xintercept = log10(1/1.5), lty = 2) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank())
+```
+
+## Ratio Data
+
+First we import the ratio datasets, which contains ratio values between predicted function based on the additive model vs observed function. These ratio values serve as a general metric for epistasis.
+
+```{r, message = F}
+
+all_ratios = do.call("rbind", lapply(list.files(pattern="ratio_export.csv", recursive = T), read_csv, skip = 1, col_names = c("id", "effect", "muts", "cv", "colors")))
+
+```
+
+Filtering ratio data to only include genotypes with 2+ mutations. Outputting length of vector.
+
+```{r}
+all_ratios = all_ratios %>% filter(muts > 1)
+
+length(all_ratios$effect) # examined muts
+```
+
+Number and % of synergystic genotypes (i.e. ratio > 1.5-fold)
+
+```{r}
+sum(all_ratios$effect > 1.5) # synergystic
+paste0("Synergystic ", round(sum(all_ratios$effect > 1.5)/length(all_ratios$effect)*100,2), "%", collapse = "") # synergystic %
+```
+
+Number and % of neutral genotypes (i.e. ratio > 1.5-fold)
+
+```{r}
+sum(all_ratios$effect >= 1/1.5 & all_ratios$effect <= 1.5) # antagonistic
+paste0("Neutral ", round(sum(all_ratios$effect >= 1/1.5 & all_ratios$effect <= 1.5)/length(all_ratios$effect)*100, 2), "%", collapse = "") # antagonistic %
+```
+
+Number and % of antagonistic genotypes (i.e. ratio > 1.5-fold)
+
+```{r}
+sum(all_ratios$effect < 1/1.5) # antagonistic
+paste0("Antagonistic ", round(sum(all_ratios$effect < 1/1.5)/length(all_ratios$effect)*100, 2), "%", collapse = "") # antagonistic %
+```
+
+### Histogram
+
+Shows distribution of positive and negative epistasis across the landscapes 
+
+```{r}
+all_ratios %>%
+  ggplot(aes(x = log10(effect))) +
+  geom_histogram(bins = 100, alpha = 0.8) +
+  geom_vline(xintercept = log10(1.5), lty = 2) +
+  geom_vline(xintercept = log10(1/1.5), lty = 2) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank())
+```
+
+We can do the same thing for 2nd, 3rd, and 4th order
+
+### 2nd order
+```{r}
+## 2nd step only
+
+all_ratios_2 = all_ratios %>% filter(muts == 2)
+
+length(all_ratios_2$effect) # examined muts
+
+sum(all_ratios_2$effect > 1.5) # synergystic
+paste0("Synergystic ", round(sum(all_ratios_2$effect > 1.5)/length(all_ratios_2$effect)*100, 2), "%", collapse = "") # synergystic %
+
+sum(all_ratios_2$effect >= 1/1.5 & all_ratios_2$effect <= 1.5) # antagonistic
+paste0("Neutral ", round(sum(all_ratios_2$effect >= 1/1.5 & all_ratios_2$effect <= 1.5)/length(all_ratios_2$effect)*100, 2), "%", collapse = "") # antagonistic %
+
+sum(all_ratios_2$effect < 1/1.5) # antagonistic
+paste0("Antagonistic ", round(sum(all_ratios_2$effect < 1/1.5)/length(all_ratios_2$effect)*100, 2), "%", collapse = "") # antagonistic %
+```
+### 3rd order
+```{r}
+## 3rd step only
+
+all_ratios_3 = all_ratios %>% filter(muts == 3)
+
+length(all_ratios_3$effect) # examined muts
+
+sum(all_ratios_3$effect > 1.5) # synergystic
+paste0("Synergystic ", round(sum(all_ratios_3$effect > 1.5)/length(all_ratios_3$effect)*100, 2), "%", collapse = "") # synergystic %
+
+sum(all_ratios_3$effect >= 1/1.5 & all_ratios_3$effect <= 1.5) # antagonistic
+paste0("Neutral ", round(sum(all_ratios_3$effect >= 1/1.5 & all_ratios_3$effect <= 1.5)/length(all_ratios_3$effect)*100, 2), "%", collapse = "") # antagonistic %
+
+sum(all_ratios_3$effect < 1/1.5) # antagonistic
+paste0("Antagonistic ", round(sum(all_ratios_3$effect < 1/1.5)/length(all_ratios_3$effect)*100, 2), "%", collapse = "") # antagonistic %
+```
+### 4th order
+```{r}
+## 4th step only
+
+all_ratios_4 = all_ratios %>% filter(muts == 4)
+
+length(all_ratios_4$effect) # examined muts
+
+sum(all_ratios_4$effect > 1.5) # synergystic
+paste0("Synergystic ", round(sum(all_ratios_4$effect > 1.5)/length(all_ratios_4$effect)*100, 2), "%", collapse = "") # synergystic %
+
+sum(all_ratios_4$effect >= 1/1.5 & all_ratios_4$effect <= 1.5) # antagonistic
+paste0("Neutral ", round(sum(all_ratios_4$effect >= 1/1.5 & all_ratios_4$effect <= 1.5)/length(all_ratios_4$effect)*100, 2), "%", collapse = "") # antagonistic %
+
+sum(all_ratios_4$effect < 1/1.5) # antagonistic
+paste0("Antagonistic ", round(sum(all_ratios_4$effect < 1/1.5)/length(all_ratios_4$effect)*100, 2), "%", collapse = "") # antagonistic %
+```
+
+## Positional Functional Contribution Data
+
+Here we import the functional contribution of single positions (not combinations), which resembles first order analysis across all datasets.
+
+```{r,message=F}
+## Reads all csvs in collated folder and combines them
+
+d = do.call("rbind", lapply(list.files(pattern="*2d_box.csv", recursive = T), read_csv, col_names = c("positions", "identity", "mut", "effects", "enzyme", "type", "cond")))
+
+
+d1 = d %>% filter_all(any_vars(!is.na(.))) # removes rows with all NA before making unique ID
+
+d1 = d1 %>%
+  unite("unique_id", c(positions, enzyme, type, cond), remove = F)
+```
+
+### Histogram
+
+Spread of functional contributions of the positions. This shows whether introducing a mutation in a given position impacts the function positively or negatively (or neutral)
+
+```{r}
+d1 %>%
+  ggplot(aes(x = effects, fill = enzyme)) +
+  geom_histogram(bins = 100, alpha = 0.8) +
+  geom_vline(xintercept = log10(1.5), lty = 2) +
+  geom_vline(xintercept = log10(1/1.5), lty = 2) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank())
+```
+
+Given this spread which percentage is significantly (using log10 1.5-fold cutoff) **negative**, **neutral**, and **positive** in that order
+
+```{r}
+
+general = c(sum(d1$effects < log10(1/1.5)) / length(d1$effects),
+  sum(d1$effects <= log10(1.5) & d1$effects >= log10(1/1.5)) / length(d1$effects),
+  sum(d1$effects > log10(1.5)) / length(d1$effects)
+)
+
+general
+```
+
+## Heterogenity in Spread
+
+Looks at 2*SD of each position/combination across all orders to determine functional heterogeneity.
+
+This gives us a quick look at the general spread of heterogenity values and their mean.
+
+```{r,message=F}
+
+idio_d = do.call("rbind", lapply(list.files(pattern="idio_df", recursive = T), read_csv))
+
+idio_d %>%
+  ggplot(aes(x = mutations, y = idiosync)) +
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  geom_hline(yintercept = log10(1.5), lty = 2) +
+  stat_summary(fun=mean, colour="black", geom="crossbar", width=0.2) +
+  labs(x = "Order", y = "Heterogenity Index") +
+  theme_classic()
+```
+### Order 1
+
+```{r}
+idio_d %>%
+  filter(mutations == "Order 1") %>%
+  ggplot(aes(x = idiosync)) +
+  geom_histogram(binwidth = 0.1, fill = "#edae49") +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
+  labs(x = "Heterogenity Index",
+       y = "Genotype Count") +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16),
+        axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)),
+        axis.title.x = element_text(margin = margin(t = 20, r = 0, b = 0, l = 0)))
+
+```
+First order positions which have a hetergenity index > log10 1.5-fold, 2-fold, 5-fold, and 10-fold 
+
+```{r}
+idio_first = idio_d %>% 
+  filter(mutations == "Order 1") %>%
+  pull(idiosync)
+
+sum(idio_first > log10(1.5)) / length(idio_first)
+sum(idio_first > log10(2)) / length(idio_first)
+sum(idio_first > log10(5)) / length(idio_first)
+sum(idio_first > log10(10)) / length(idio_first)
+```
+### Order 2-4
+
+Histogram to show heterogenity at Orders 2, 3, and 4 with the log10 1.5-fold significance threshold
+
+```{r}
+idio_d %>%
+  filter(mutations == "Order 2" | mutations == "Order 3" | mutations == "Order 4") %>%
+  ggplot(aes(x = idiosync)) +
+  geom_histogram(binwidth = 0.1, fill = "#edae49") +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
+  labs(x = "Idiosyncrasy Metric",
+       y = "Genotype Count") +
+  facet_wrap(~ mutations) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none",
+        strip.background = element_blank(),
+        strip.text.x = element_blank())
+```
+
+What percentage of positions remain significantly heterogeneous at these orders?
+
+```{r}
+idio_d %>%
+  filter(mutations == "Order 2" | mutations == "Order 3" | mutations == "Order 4") %>%
+  mutate(idiosync = idiosync > log10(1.5)) %>%
+  group_by(mutations) %>%
+  summarise(idiosync_sig = sum(idiosync),
+            idiosync_total = length(idiosync),
+            idiosync = sum(idiosync)/length(idiosync) * 100
+            )
+```
+
+## Heterogenity in Sign
+
+Collects all $\Delta$$\Delta$Function data for all orders
+
+```{r,message=F}
+higher_order_list = list.files(pattern="higher_box", recursive = T)
+
+higher_df = data.frame()
+for(higher_file in 1:length(higher_order_list)){
+  Condition = str_split(str_split(higher_order_list[higher_file], "_")[[1]][3], "/")[[1]][1]
+  Measurement = str_split(higher_order_list[higher_file], "_")[[1]][2]
+  Enzyme = str_split(higher_order_list[higher_file], "_")[[1]][1]
+  appending_file = read_csv(higher_order_list[higher_file])
+  appending_file$Condition = Condition
+  appending_file$Measurement = Measurement
+  appending_file$Enzyme = Enzyme
+  higher_df = bind_rows(higher_df, appending_file)
+}
+
+
+higher_df = higher_df %>%
+  unite("unique_id", c(pos, Condition, Measurement, Enzyme), remove = F)
+
+higher_all_sign_check = higher_df %>%
+  mutate(mutations = factor(paste("Order", mutations, sep = " "))) %>%
+  group_by(unique_id, mutations) %>%
+  summarise(min_effect = min(avg),
+            max_effect = max(avg))
+
+```
+
+Assigning positive, neutral, negative, negative-neutral, positive-neutral, and negative-positive 'types' based on log10 1.5-fold threshold to every Order
+
+```{r}
+
+threshold = 1.5
+
+types = c()
+for(each in 1:dim(higher_all_sign_check)[1]){
+  if(higher_all_sign_check$min_effect[each] < log10(1/threshold)){
+    # Negative branch
+    if(higher_all_sign_check$max_effect[each] < log10(1/threshold)) {
+      # Full negative
+      types = c(types, "Negative")
+    } else if(higher_all_sign_check$max_effect[each] <= log10(threshold)) {
+      # Negative Neutral
+      types = c(types, "Neutral Negative")
+    } else {
+      # Negative Positive
+      types = c(types, "Positive Negative")
+    }
+  } else {
+    # Neutral or Positive
+    if(higher_all_sign_check$min_effect[each] > log10(threshold)) {
+      # Full positive
+      types = c(types, "Positive")
+    } else if(higher_all_sign_check$max_effect[each] > log10(threshold)) {
+      # Neutral Positive
+      types = c(types, "Neutral Positive")
+    } else {
+      # Neutral
+      types = c(types, "Neutral")
+    }
+  }
+}
+
+higher_all_sign_check$type = factor(types)
+```
+
+All outputs show position/combination numbers in each catagory, followed by the total sum of all probed positions/combinations at that order, and finally percentages of each category
+
+
+### Order 1
+
+```{r}
+order_checker = higher_all_sign_check %>% 
+  filter(mutations == "Order 1") %>%
+  pull(type) 
+
+summary(order_checker) 
+sum(summary(order_checker)) 
+summary(order_checker) / length(order_checker) * 100
+```
+
+### Order 2
+
+```{r}
+order_checker = higher_all_sign_check %>% 
+  filter(mutations == "Order 2") %>%
+  pull(type) 
+
+summary(order_checker) 
+sum(summary(order_checker)) 
+summary(order_checker) / length(order_checker) * 100
+```
+
+### Order 3
+
+```{r}
+order_checker = higher_all_sign_check %>% 
+  filter(mutations == "Order 3") %>%
+  pull(type) 
+
+summary(order_checker) 
+sum(summary(order_checker)) 
+summary(order_checker) / length(order_checker) * 100
+```
+
+### Order 4
+
+```{r}
+order_checker = higher_all_sign_check %>% 
+  filter(mutations == "Order 4") %>%
+  pull(type) 
+
+summary(order_checker) 
+sum(summary(order_checker)) 
+summary(order_checker) / length(order_checker) * 100
+```
+
+## WT to Mean Deviation
+
+Purpose of this analysis was to determine the difference in $\Delta$$\Delta$Function between the WT-background contribution of a given position/combination and the mean contribution of a given position or combination
+
+# Histogram
+
+The spread of WT vs mean differences for each Order (1-4)
+
+
+```{r,message=F}
+higher_df_mean = higher_df %>%
+  filter(mutations < 5) %>%
+  group_by(unique_id) %>%
+  summarise(avg = mean(avg))
+
+devs = c()
+cur_mutations = c()
+for(i in 1:dim(higher_df_mean)[1]) {
+  curr_id = higher_df_mean[i,1] %>% pull(unique_id)
+  devs = c(devs, abs( (higher_df %>% filter(unique_id == curr_id) %>% pull(avg)) - (higher_df_mean[i,2] %>% pull(avg)) ))
+  cur_mutations = c(cur_mutations, (higher_df %>% filter(unique_id == curr_id) %>% pull(mutations)))
+}
+
+devs_df = data.frame(devs = devs, muts = cur_mutations)
+
+## WT heterogenity for higher_orders
+
+devs_df %>%
+  ggplot(aes(x = devs)) +
+  geom_histogram(binwidth=0.1, fill = "#edae49") +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
+  facet_wrap(~ muts) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none")
+```
+
+Table to show percentages of WT-bg points that deviate from the positional/combinatorial mean by significance threshold (log10 1.5-fold) 
+
+```{r}
+devs_df %>%
+  mutate(muts = factor(muts)) %>%
+  group_by(muts) %>%
+  summarise(percent = sum(devs > log10(1.5)) / length(devs),
+            outlier = sum(devs > log10(1.5)),
+            total = length(devs))
+
+```
