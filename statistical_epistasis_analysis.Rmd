@@ -444,3 +444,56 @@ devs_df %>%
             total = length(devs))
 
 ```
+
+
+# Individual Trends
+
+This sections attempts to probe if the previous values from the statistical analysis are representative in the individual data sets
+
+### Sign Heterogenity in Invididual datasets
+
+```{r, message=F}
+d_individual = d %>% filter_all(any_vars(!is.na(.))) # removes rows with all NA before making unique ID
+
+d_individual = d_individual %>%
+  unite("landscape_id", c(enzyme, type, cond), remove = F)
+
+landscape_ids = unique(d_individual$landscape_id)
+
+general_df = tibble()
+for(i in 1:length(landscape_ids)) {
+  d_curr_individual = d_individual %>% filter(landscape_id == landscape_ids[i])
+
+  general = c(unique(d_curr_individual$enzyme),
+    landscape_ids[i],
+    sum(d_curr_individual$effects < log10(1/1.5)) / length(d_curr_individual$effects),
+    sum(d_curr_individual$effects <= log10(1.5) & d_curr_individual$effects >= log10(1/1.5)) / length(d_curr_individual$effects),
+    sum(d_curr_individual$effects > log10(1.5)) / length(d_curr_individual$effects)
+  )
+
+  general_df = rbind(general_df, general)
+}
+ 
+colnames(general_df) = c("Enzyme", "Landscape ID", "Negative", "Neutral", "Positive")
+
+general_df[-1]
+
+```
+
+The trend appears to be heterogenous, i.e. the fraction of negative, neutral, and positive is varied across all landscapes but averages out to roughly equal proportions when all landscapes are considered together.
+
+For example, AP shows very negative contribution at 77.5% of all mutations, DHFR kcats are predominantly negative while Kis are almost all positive (due to the adaptive nature of the mutations). MPH shows strong positives as it is also adaptive. NfsA is predominantly neutral, with some positive contribution. OXA is positive and neutral for adaptive trajectories, and negative and neutral for trade-off. PTE is positive for its adaptive substrate, but shows more negative behavior for lactones and OPs. TEM across all antibiotics is predominantly neutral (no directy adaptation). Finally the adaptive MIC of TEM is mostly positive with 66.3%.
+
+```{r}
+general_df %>%
+  pivot_longer(c(3,4,5)) %>%
+  mutate(value = as.numeric(value)*100) %>%
+  ggplot(aes(x = name, y = value, color = Enzyme)) +
+  geom_point() +
+  stat_summary(fun=mean, colour="darkred", geom="crossbar", width=0.2) +
+  theme_classic()
+```
+
+---
+
+### Still need to implement individual representation of functional heterogeneity and deviation from WT
