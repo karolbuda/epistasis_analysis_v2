@@ -219,6 +219,9 @@ idio_d %>%
   ggplot(aes(x = idiosync)) +
   geom_histogram(binwidth = 0.1, fill = "#edae49") +
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 1) +
   labs(x = "Heterogenity Index",
        y = "Genotype Count") +
   theme_classic() +
@@ -497,3 +500,146 @@ general_df %>%
 ---
 
 ### Still need to implement individual representation of functional heterogeneity and deviation from WT
+
+---
+
+# Prediction
+
+Leaving this section for the MAE prediction part
+
+---
+
+# Trajectory 
+
+### Seeing how adaptive trajectories are affected by epistasis
+
+First I need to create a global trajectory data frame
+
+```{r,message=F}
+all_traj = do.call("rbind", lapply(list.files(pattern="traj_epi_*", recursive = T), read_csv, skip = 1, col_names = c("genotype", "avg", "pos", "mutations", "likely", "enzyme_name", "measure_type", "cond")))
+
+all_traj = all_traj %>% unite("unique_id", c(enzyme_name, measure_type, cond), remove = F)
+
+```
+
+Next I need to decide which landscapes are adaptive. These are listed below:
+
+```{r}
+adaptive_trajectories = c("DHFR_ki_trajg", 
+                          "DHFR_ki_trajr",
+                          "MPH_catact_ZnPTM",
+                          "NfsA_ec50_2039",
+                          "NfsA_ec50_3637",
+                          "OXA-48_ic50_CAZtraj1",
+                          "OXA-48_ic50_CAZtraj2",
+                          "OXA-48_ic50_CAZtraj3",
+                          "PTE_catact_2NH",
+                          "TEM_MIC_weinreich")
+
+adaptive_traj = all_traj %>% filter(unique_id %in% adaptive_trajectories)
+```
+Which genotypes in the adaptive landscapes for the favored trajectory are POSITIVELY epistatic and epistatic in general 
+
+Note: some trajectories don't go to the last variant, so we explore epistasis of all other genotypes which may go beyond last variant
+
+```{r}
+adaptive_traj_favored = adaptive_traj %>% filter(mutations > 1 & likely) %>% pull(avg)
+
+sum(adaptive_traj_favored > log10(1.5)) / length(adaptive_traj_favored)
+
+sum(adaptive_traj_favored > log10(1.5) | adaptive_traj_favored < log10(1/1.5)) / length(adaptive_traj_favored)
+```
+How many positive epistatic vs all epistatic genotypes vs all genotypes encountered in these landscapes?
+
+```{r}
+sum(adaptive_traj_favored > log10(1.5))
+sum(adaptive_traj_favored > log10(1.5) | adaptive_traj_favored < log10(1/1.5))
+length(adaptive_traj_favored)
+```
+
+Which genotypes in the non-adaptive landscapes for the favored trajectory are NEGATIVELY epistatic and epistatic in general
+
+```{r}
+`%notin%` <- Negate(`%in%`)
+
+non_adaptive_traj_favored = all_traj %>% filter(unique_id %notin% adaptive_trajectories & mutations > 1 & !likely) %>% pull(avg)
+
+sum(non_adaptive_traj_favored < log10(1/1.5))
+sum(non_adaptive_traj_favored > log10(1.5) | non_adaptive_traj_favored < log10(1/1.5))
+length(non_adaptive_traj_favored)
+
+sum(non_adaptive_traj_favored < log10(1/1.5)) / length(non_adaptive_traj_favored)
+
+sum(non_adaptive_traj_favored > log10(1.5) | non_adaptive_traj_favored < log10(1/1.5)) / length(non_adaptive_traj_favored)
+
+
+```
+
+### Ruggedness plots
+
+I can make a ruggedness plot for each adaptive landscape, where deviation from 0 implies epistatic contribution of that genotype
+
+```{r}
+adaptive_traj %>% 
+  filter(mutations > 1 & likely) %>%
+  ggplot(aes(x = mutations, y = avg)) +
+  geom_line() +
+  geom_text_repel(aes(label = genotype), force = 1.5, direction = "y", box.padding = 0, segment.size = 0.2, size = 2.5) +
+  geom_hline(yintercept = log10(1.5), lty = 2) +
+  geom_hline(yintercept = log10(1/1.5), lty = 2) +
+  geom_hline(yintercept = 0) +
+  facet_wrap(~ unique_id) +
+  theme_classic()
+```
+What if we compare it to the mean at that combination or position as well, not just assumed additivity (0 +/- log10(1.5))?
+
+```{r}
+higher_means = higher_df %>%
+  unite("partial_id", c(Enzyme, Measurement, Condition), remove = F) %>%
+  filter(partial_id %in% adaptive_trajectories) %>% ## use partial ID to only pick up the adaptive trajectories
+  group_by(unique_id) %>%
+  mutate(avg = mean(avg)) %>% ## Is arithmetic mean OK here?
+  ungroup() %>%
+  distinct(unique_id, .keep_all = T) ## Remove unique_id replicates
+
+adaptive_means = higher_means %>% arrange(partial_id, pos) %>% pull(avg)
+
+adaptive_traj = adaptive_traj %>% arrange(unique_id, pos) %>% mutate(means = adaptive_means)
+
+adaptive_traj %>%
+  filter(likely) %>%
+  mutate(wt_bg = avg) %>%
+  pivot_longer(c(wt_bg, means)) %>%
+  ggplot(aes(x = mutations, y = value, color = name)) +
+  geom_line() +
+  geom_text_repel(aes(label = genotype), force = 1.5, direction = "y", box.padding = 0, segment.size = 0.2, size = 2.5) +
+  geom_hline(yintercept = log10(1.5), lty = 2) +
+  geom_hline(yintercept = log10(1/1.5), lty = 2) +
+  geom_hline(yintercept = 0) +
+  facet_wrap(~ unique_id) +
+  theme_classic()
+  
+```
+Which one of the genotypes seen above are the outliers?
+
+```{r}
+adaptive_traj %>%
+  mutate(outlier = abs(means - avg) > log10(1.5))
+```
+
+
+What % of adaptive landscape genotypes are outliers from the mean?
+What % of adaptive accessible trajectory genotypes are outliers from the mean?
+What % of adaptive less accessible trajectory genotypes are outliers from the mean?
+
+
+```{r}
+adaptive_traj_final = adaptive_traj %>%
+  mutate(outlier = abs(means - avg) > log10(1.5))
+
+sum(adaptive_traj_final$outlier) / length(adaptive_traj_final$outlier)
+
+sum(filter(adaptive_traj_final, likely) %>% pull(outlier)) / length(filter(adaptive_traj_final, likely) %>% pull(outlier))
+
+sum(filter(adaptive_traj_final, !likely) %>% pull(outlier)) / length(filter(adaptive_traj_final, !likely) %>% pull(outlier))
+```
