@@ -397,13 +397,64 @@ sum(summary(order_checker))
 summary(order_checker) / length(order_checker) * 100
 ```
 
-## WT to Mean Deviation
+## WT points to Mean Deviation
 
 Purpose of this analysis was to determine the difference in $\Delta$$\Delta$Function between the WT-background contribution of a given position/combination and the mean contribution of a given position or combination
 
 # Histogram
 
-The spread of WT vs mean differences for each Order (1-4)
+The spread of all positional contribution vs mean differences for each Order (1-4)
+
+
+```{r,message=F}
+higher_df_mean = higher_df %>%
+  filter(mutations < 5) %>%
+  group_by(unique_id) %>%
+  summarise(avg = mean(avg))
+
+devs = c()
+cur_mutations = c()
+for(i in 1:dim(higher_df_mean)[1]) {
+  curr_id = higher_df_mean[i,1] %>% pull(unique_id)
+  devs = c(devs, abs( (higher_df %>% filter(!str_detect(genotype, "1")) %>% filter(unique_id == curr_id) %>% pull(avg)) - (higher_df_mean[i,2] %>% pull(avg)) ))
+  cur_mutations = c(cur_mutations, (higher_df %>% filter(!str_detect(genotype, "1")) %>% filter(unique_id == curr_id) %>% pull(mutations)))
+}
+
+devs_df = data.frame(devs = devs, muts = cur_mutations)
+
+## WT heterogenity for higher_orders
+
+devs_df %>%
+  ggplot(aes(x = devs)) +
+  geom_histogram(binwidth=0.1, fill = "#edae49") +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
+  facet_wrap(~ muts) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none")
+```
+
+Table to show percentages of WT-bg points that deviate from the positional/combinatorial mean by significance threshold (log10 1.5-fold) 
+
+```{r}
+devs_df %>%
+  mutate(muts = factor(muts)) %>%
+  group_by(muts) %>%
+  summarise(percent = sum(devs > log10(1.5)) / length(devs),
+            outlier = sum(devs > log10(1.5)),
+            total = length(devs))
+
+```
+
+## All points to Mean Deviation
+
+Purpose of this analysis was to determine the difference in $\Delta$$\Delta$Function between functional contribution of a given position/combination in any background and the mean contribution of a given position or combination
+
+# Histogram
+
+The spread of all positional contribution vs mean differences for each Order (1-4)
 
 
 ```{r,message=F}
@@ -422,7 +473,7 @@ for(i in 1:dim(higher_df_mean)[1]) {
 
 devs_df = data.frame(devs = devs, muts = cur_mutations)
 
-## WT heterogenity for higher_orders
+## All heterogenity for higher_orders
 
 devs_df %>%
   ggplot(aes(x = devs)) +
@@ -507,6 +558,8 @@ general_df %>%
 
 Leaving this section for the MAE prediction part
 
+
+
 ---
 
 # Trajectory 
@@ -534,7 +587,8 @@ adaptive_trajectories = c("DHFR_ki_trajg",
                           "OXA-48_ic50_CAZtraj2",
                           "OXA-48_ic50_CAZtraj3",
                           "PTE_catact_2NH",
-                          "TEM_MIC_weinreich")
+                          "TEM_MIC_weinreich",
+                          "DHFR_ic75_palmer")
 
 adaptive_traj = all_traj %>% filter(unique_id %in% adaptive_trajectories)
 ```
@@ -574,6 +628,61 @@ sum(non_adaptive_traj_favored > log10(1.5) | non_adaptive_traj_favored < log10(1
 
 
 ```
+### Prediction of relevant trajectories
+
+
+```{r,message=F}
+adaptive_traj_fave = adaptive_traj %>% filter(likely)
+
+###
+
+plotting_d = tibble()
+dummy2 = data.frame()
+
+for(i in 1:length(adaptive_trajectories)) {
+  
+  suffix = tail(str_split(adaptive_trajectories[i], "_")[[1]], 1)
+  
+  file = paste0("pred_df_", suffix, "_", adaptive_trajectories[i], ".csv")
+  
+  d = read_csv(paste0(adaptive_trajectories[i], "/", file))
+  
+  genos = str_replace_all(adaptive_traj_fave[which(adaptive_traj_fave$unique_id %in% adaptive_trajectories[i]),]$genotype, "x", "1")
+  
+  genos = c(str_replace(genos[1], "1", "0"), genos)
+  
+  dummy2 = rbind(dummy2, data.frame(trajectory = adaptive_trajectories[i], Z = d[which(d$numbers == tail(genos, 1)),]$`observed effect`))
+  
+  others = c()
+  for(j in 1:(length(genos) - 2)) {
+    others = c(others, colnames(d)[which(colnames(d) == "mutations") + j]) ## Get all steps before final step of evaluated genotype
+  }
+  
+  plotting_d = rbind(plotting_d, d[which(d$numbers %in% genos),] %>%
+    pivot_longer(cols = c(`observed effect`,
+                          `epistatic effect`,
+                          `WT effect`,
+                          others)) %>% ## add those steps into line plots
+    select(c(mutations, name, value)) %>%
+    mutate(trajectory = adaptive_trajectories[i]))
+
+}
+```
+
+Next we plot all of those
+
+```{r}
+ggplot(plotting_d, aes(x = mutations, y = value, color = name)) +
+  geom_line(lwd = 2) +
+  facet_wrap(~ trajectory) +
+  geom_hline(data = dummy2, aes(yintercept = Z)) +
+  geom_hline(data = dummy2, aes(yintercept = Z + log10(1.5)), lty = 2) +
+  geom_hline(data = dummy2, aes(yintercept = Z - log10(1.5)), lty = 2) +
+  geom_hline(data = dummy2, aes(yintercept = Z + log10(10)), lty = 2, color = "grey") +
+  geom_hline(data = dummy2, aes(yintercept = Z - log10(10)), lty = 2, color = "grey") +
+  theme_classic()
+```
+
 
 ### Ruggedness plots
 
@@ -637,9 +746,15 @@ What % of adaptive less accessible trajectory genotypes are outliers from the me
 adaptive_traj_final = adaptive_traj %>%
   mutate(outlier = abs(means - avg) > log10(1.5))
 
+length(adaptive_traj_final$outlier)
+sum(adaptive_traj_final$outlier)
 sum(adaptive_traj_final$outlier) / length(adaptive_traj_final$outlier)
 
+length(filter(adaptive_traj_final, likely) %>% pull(outlier))
+sum(filter(adaptive_traj_final, likely) %>% pull(outlier))
 sum(filter(adaptive_traj_final, likely) %>% pull(outlier)) / length(filter(adaptive_traj_final, likely) %>% pull(outlier))
 
+length(filter(adaptive_traj_final, !likely) %>% pull(outlier))
+sum(filter(adaptive_traj_final, !likely) %>% pull(outlier))
 sum(filter(adaptive_traj_final, !likely) %>% pull(outlier)) / length(filter(adaptive_traj_final, !likely) %>% pull(outlier))
 ```
