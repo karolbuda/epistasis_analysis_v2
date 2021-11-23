@@ -17,6 +17,29 @@ Here we look at the fold-change data used in the input files. This allows us to 
 
 ```{r, message=F}
 fit_land = do.call("rbind", lapply(list.files(pattern="observed_values.csv", recursive = T), read_csv, skip = 1, show_col_types=F, col_names = c("id", "effect", "muts", "2", "3", "enz"))) %>% select(-c('2', '3'))
+
+## Make fit_land have IDs by finding where muts are 0, i.e. start of new dataset, and multiplying
+## Those values by the folder names to generate ID vector
+
+fit_land_spots = c(which(fit_land$muts == 0), (dim(fit_land)[1] + 1)) # Add end of dataset
+fit_land_counts = c()
+
+for(i in 1:(length(fit_land_spots) - 1)) {
+  
+  if(i == 1) {
+    fit_land_counts = c(fit_land_counts, fit_land_spots[i + 1] - 1)
+  } else {
+    fit_land_counts = c(fit_land_counts, fit_land_spots[i + 1] - fit_land_spots[i])
+  }
+
+}
+
+## This assumes folders are read in the order that they are listed
+
+fit_land_ids = rep(str_remove_all(list.files(pattern="observed_values.csv", recursive = T), "/observed_values.csv"), fit_land_counts)
+
+fit_land$unique_id = fit_land_ids
+
 ```
 
 The data shows the following distribution
@@ -757,4 +780,103 @@ sum(filter(adaptive_traj_final, likely) %>% pull(outlier)) / length(filter(adapt
 length(filter(adaptive_traj_final, !likely) %>% pull(outlier))
 sum(filter(adaptive_traj_final, !likely) %>% pull(outlier))
 sum(filter(adaptive_traj_final, !likely) %>% pull(outlier)) / length(filter(adaptive_traj_final, !likely) %>% pull(outlier))
+```
+
+# Diminishing Returns
+
+Next we try to see if adaptive vs random trajectories show diminishing returns.
+
+Doing for single mutants first for every single landscape...
+
+```{r}
+higher_df_diminish = higher_df %>%
+  unite("partial_id", c(Enzyme, Measurement, Condition)) %>%
+  filter(mutations == 1) %>%
+  mutate(from = str_replace_all(genotype, "x", "0"),
+         to = str_replace_all(genotype, "x", "1"))
+
+start_effect = c()
+for(i in 1:dim(higher_df_diminish)[1]) {
+  start_effect = c(start_effect, filter(fit_land, unique_id == higher_df_diminish$partial_id[i] & id == higher_df_diminish$from[i]) 
+  %>% pull(effect))
+}
+
+higher_df_diminish$start_effect = start_effect
+
+ggplot(higher_df_diminish, aes(x = start_effect, y = avg)) +
+  geom_point() +
+  theme_classic()
+       
+
+```
+Next only looking at adaptive landscapes
+
+```{r}
+higher_df_diminish = higher_df %>%
+  unite("partial_id", c(Enzyme, Measurement, Condition)) %>%
+  filter(mutations == 1) %>%
+  mutate(from = str_replace_all(genotype, "x", "0"),
+         to = str_replace_all(genotype, "x", "1")) %>%
+  filter(partial_id %in% adaptive_trajectories)
+
+start_effect = c()
+for(i in 1:dim(higher_df_diminish)[1]) {
+  start_effect = c(start_effect, filter(fit_land, unique_id == higher_df_diminish$partial_id[i] & id == higher_df_diminish$from[i]) 
+  %>% pull(effect))
+}
+
+higher_df_diminish$start_effect = start_effect
+
+ggplot(higher_df_diminish, aes(x = start_effect, y = avg)) +
+  geom_point() +
+  facet_wrap(~ partial_id) +
+  theme_classic() 
+```
+What about only looking at the best step from each starting point?
+
+```{r}
+higher_df_diminish %>%
+  group_by(partial_id, from) %>%
+  summarise(avg = max(avg), start_effect = start_effect) %>%
+  distinct() %>%
+  ggplot(aes(x = start_effect, y = avg)) +
+  geom_point() +
+  facet_wrap(~ partial_id) +
+  theme_classic()
+```
+What about only looking at the adaptive trajectories?
+
+```{r}
+all_traj_points = all_traj %>% 
+  filter(likely & unique_id %in% adaptive_trajectories) %>%
+  mutate(genotype = str_replace_all(genotype, "x", "1")) %>%
+  select(genotype, unique_id)
+
+
+higher_df_diminish_traj = tibble()
+prev_geno = c()
+for(i in 1:dim(all_traj_points)[1]) {
+ 
+  if(length(prev_geno) > 0) {
+    higher_df_diminish_traj = rbind(higher_df_diminish_traj, higher_df_diminish %>% filter(partial_id == all_traj_points$unique_id[i] & to == all_traj_points$genotype[i]) %>% filter(from == prev_geno)) 
+  } else {
+    higher_df_diminish_traj = rbind(higher_df_diminish_traj, higher_df_diminish %>% filter(partial_id == all_traj_points$unique_id[i] & to == all_traj_points$genotype[i]))
+  }
+    
+  if(i != dim(all_traj_points)[1]) { 
+    if(all_traj_points$unique_id[i + 1] == all_traj_points$unique_id[i]) {
+      prev_geno = tail(higher_df_diminish_traj$to, 1)
+    } else {
+      prev_geno = c()
+    }
+  }
+
+}
+
+higher_df_diminish_traj %>%
+  ggplot(aes(x = start_effect, y = avg)) +
+  geom_point() +
+  facet_wrap(~ partial_id) +
+  theme_classic()
+
 ```
