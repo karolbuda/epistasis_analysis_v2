@@ -9,6 +9,7 @@ knitr::opts_knit$set(root.dir = "/Users/karolbuda/OneDrive - UBC/PhD/Epistasis_L
 library(tidyverse)
 library(ggExtra)
 library(ggrepel)
+library(ggpubr)
 ```
 
 ## Fold-Change Data
@@ -443,11 +444,11 @@ for(i in 1:dim(higher_df_mean)[1]) {
   cur_mutations = c(cur_mutations, (higher_df %>% filter(!str_detect(genotype, "1")) %>% filter(unique_id == curr_id) %>% pull(mutations)))
 }
 
-devs_df = data.frame(devs = devs, muts = cur_mutations)
+devs_df_wt = data.frame(devs = devs, muts = cur_mutations)
 
 ## WT heterogenity for higher_orders
 
-devs_df %>%
+devs_df_wt %>%
   ggplot(aes(x = devs)) +
   geom_histogram(binwidth=0.1, fill = "#edae49") +
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
@@ -462,7 +463,7 @@ devs_df %>%
 Table to show percentages of WT-bg points that deviate from the positional/combinatorial mean by significance threshold (log10 1.5-fold) 
 
 ```{r}
-devs_df %>%
+devs_df_wt %>%
   mutate(muts = factor(muts)) %>%
   group_by(muts) %>%
   summarise(percent = sum(devs > log10(1.5)) / length(devs),
@@ -581,8 +582,6 @@ general_df %>%
 
 Leaving this section for the MAE prediction part
 
-
-
 ---
 
 # Trajectory 
@@ -592,7 +591,7 @@ Leaving this section for the MAE prediction part
 First I need to create a global trajectory data frame
 
 ```{r,message=F}
-all_traj = do.call("rbind", lapply(list.files(pattern="traj_epi_*", recursive = T), read_csv, skip = 1, col_names = c("genotype", "avg", "pos", "mutations", "likely", "enzyme_name", "measure_type", "cond")))
+all_traj = do.call("rbind", lapply(list.files(pattern="traj_epi_*", recursive = T), read_csv, skip = 1, show_col_types=F, col_names = c("genotype", "avg", "pos", "mutations", "likely", "enzyme_name", "measure_type", "cond")))
 
 all_traj = all_traj %>% unite("unique_id", c(enzyme_name, measure_type, cond), remove = F)
 
@@ -653,7 +652,6 @@ sum(non_adaptive_traj_favored > log10(1.5) | non_adaptive_traj_favored < log10(1
 ```
 ### Prediction of relevant trajectories
 
-
 ```{r,message=F}
 adaptive_traj_fave = adaptive_traj %>% filter(likely)
 
@@ -668,11 +666,11 @@ for(i in 1:length(adaptive_trajectories)) {
   
   file = paste0("pred_df_", suffix, "_", adaptive_trajectories[i], ".csv")
   
-  d = read_csv(paste0(adaptive_trajectories[i], "/", file))
+  d = read_csv(paste0(adaptive_trajectories[i], "/", file), show_col_types=F)
   
   genos = str_replace_all(adaptive_traj_fave[which(adaptive_traj_fave$unique_id %in% adaptive_trajectories[i]),]$genotype, "x", "1")
   
-  genos = c(str_replace(genos[1], "1", "0"), genos)
+  genos = c(str_replace_all(genos[1], "1", "0"), genos)
   
   dummy2 = rbind(dummy2, data.frame(trajectory = adaptive_trajectories[i], Z = d[which(d$numbers == tail(genos, 1)),]$`observed effect`))
   
@@ -705,7 +703,15 @@ ggplot(plotting_d, aes(x = mutations, y = value, color = name)) +
   geom_hline(data = dummy2, aes(yintercept = Z - log10(10)), lty = 2, color = "grey") +
   theme_classic()
 ```
+Also return as a table
 
+```{r}
+plotting_d %>%
+  pivot_wider(names_from = name, values_from = value) 
+
+write.csv(plotting_d %>%
+  pivot_wider(names_from = name, values_from = value) , "/Users/karolbuda/OneDrive - UBC/PhD/Epistasis_Lit/Bulk/preds.csv")
+```
 
 ### Ruggedness plots
 
@@ -830,6 +836,8 @@ higher_df_diminish$start_effect = start_effect
 ggplot(higher_df_diminish, aes(x = start_effect, y = avg)) +
   geom_point() +
   facet_wrap(~ partial_id) +
+  geom_smooth(method = 'lm', formula = y ~ x) +
+  stat_cor(aes(label = paste(..rr.label.., ..p.label.., sep = "~~")), color = "red", geom = "label", label.x = -2.5, label.y = 4, r.accuracy = 0.01, p.accuracy = 0.01) +
   theme_classic() 
 ```
 What about only looking at the best step from each starting point?
@@ -841,6 +849,8 @@ higher_df_diminish %>%
   distinct() %>%
   ggplot(aes(x = start_effect, y = avg)) +
   geom_point() +
+  geom_smooth(method = 'lm', formula = y ~ x) +
+  stat_cor(aes(label = paste(..rr.label.., ..p.label.., sep = "~~")), color = "red", geom = "label", label.x = -2, label.y = 4.7, r.accuracy = 0.01, p.accuracy = 0.01) +
   facet_wrap(~ partial_id) +
   theme_classic()
 ```
@@ -876,6 +886,8 @@ for(i in 1:dim(all_traj_points)[1]) {
 higher_df_diminish_traj %>%
   ggplot(aes(x = start_effect, y = avg)) +
   geom_point() +
+  geom_smooth(method = 'lm', formula = y ~ x) +
+  stat_cor(aes(label = paste(..rr.label.., ..p.label.., sep = "~~")), color = "red", geom = "label", label.x = 0, label.y = 3.7, r.accuracy = 0.01, p.accuracy = 0.01) +
   facet_wrap(~ partial_id) +
   theme_classic()
 
