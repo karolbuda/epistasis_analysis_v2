@@ -5,7 +5,7 @@ output: html_document
 
 ```{r, setup, include=FALSE}
 # Briefly change to Input folder for assessing error rates
-knitr::opts_knit$set(root.dir = "/Users/karolbuda/OneDrive - UBC/PhD/Epistasis_Lit/Bulk/Input")
+knitr::opts_knit$set(root.dir = "/Users/karolbuda/OneDrive - UBC/PhD/Epistasis_Lit/__VersionCtrl__/epistasis_analysis_v2/Input")
 
 library(tidyverse)
 library(ggExtra)
@@ -58,7 +58,7 @@ error_rates %>%
 We then have to change to the output directory
 
 ```{r, setup, include = F}
-knitr::opts_knit$set(root.dir = "/Users/karolbuda/OneDrive - UBC/PhD/Epistasis_Lit/Bulk/Output")
+knitr::opts_knit$set(root.dir = "/Users/karolbuda/OneDrive - UBC/PhD/Epistasis_Lit/__VersionCtrl__/epistasis_analysis_v2/Output")
 ```
 
 ## Fold-Change Data
@@ -315,6 +315,11 @@ idio_first = idio_d %>%
   filter(mutations == "Order 1") %>%
   pull(idiosync)
 
+print(paste0(sum(idio_first > log10(1.5)), "/", length(idio_first)))
+print(paste0(sum(idio_first > log10(2)), "/", length(idio_first)))
+print(paste0(sum(idio_first > log10(5)), "/", length(idio_first)))
+print(paste0(sum(idio_first > log10(10)), "/", length(idio_first)))
+
 sum(idio_first > log10(1.5)) / length(idio_first)
 sum(idio_first > log10(2)) / length(idio_first)
 sum(idio_first > log10(5)) / length(idio_first)
@@ -562,14 +567,17 @@ higher_df_mean = higher_df %>%
   summarise(avg = mean(avg))
 
 devs = c()
+sign_devs = c()
 cur_mutations = c()
 for(i in 1:dim(higher_df_mean)[1]) {
-  curr_id = higher_df_mean[i,1] %>% pull(unique_id)
-  devs = c(devs, abs( (higher_df %>% filter(!str_detect(genotype, "1")) %>% filter(unique_id == curr_id) %>% pull(avg)) - (higher_df_mean[i,2] %>% pull(avg)) ))
+  curr_id = higher_df_mean$unique_id[i]
+  devs = c(devs, abs( (higher_df %>% filter(!str_detect(genotype, "1")) %>% filter(unique_id == curr_id) %>% pull(avg)) - (higher_df_mean$avg[i]) ))
   cur_mutations = c(cur_mutations, (higher_df %>% filter(!str_detect(genotype, "1")) %>% filter(unique_id == curr_id) %>% pull(mutations)))
+  sign_devs = c(sign_devs, ifelse( (((higher_df %>% filter(!str_detect(genotype, "1")) %>% filter(unique_id == curr_id) %>% pull(avg)) > log10(1.5) & (higher_df_mean$avg[i]) < log10(1.5)) | ((higher_df %>% filter(!str_detect(genotype, "1")) %>% filter(unique_id == curr_id) %>% pull(avg)) < log10(1.5) & (higher_df_mean$avg[i]) > log10(1.5))), T, F)) ## Check if WT is positive while average is negative or vice versa
 }
 
-devs_df_wt = data.frame(devs = devs, muts = cur_mutations)
+
+devs_df_wt = data.frame(devs = devs, muts = cur_mutations, sign_devs = sign_devs)
 ```
 ## WT heterogenity for Order 1
 
