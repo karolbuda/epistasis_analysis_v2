@@ -4,7 +4,8 @@ output: html_document
 ---
 
 ```{r, setup, include=FALSE}
-knitr::opts_knit$set(root.dir = "/Users/karolbuda/OneDrive - UBC/PhD/Epistasis_Lit/Bulk/Output")
+# Briefly change to Input folder for assessing error rates
+knitr::opts_knit$set(root.dir = "/Users/karolbuda/OneDrive - UBC/PhD/Epistasis_Lit/Bulk/Input")
 
 library(tidyverse)
 library(ggExtra)
@@ -12,12 +13,60 @@ library(ggrepel)
 library(ggpubr)
 ```
 
+## Error-rate assessment
+
+Take all the input files, attach their unique_id, find the ones with replicates, then look at the median of 2*SD (~95% spread around measurement mean) for all measurements to decided on an approriate significance threshold
+
+```{r}
+file_vector = str_remove(list.files(pattern="*.csv", recursive = T), ".csv")
+
+error_set = lapply(list.files(pattern="*.csv", recursive = T), read_csv, skip = 5, col_names = F, col_select = 1:2, show_col_types=F)
+
+for(i in 1:length(error_set)){
+  error_set[[i]][,3] = file_vector[i]
+}
+
+error_set = do.call("rbind", error_set)
+
+colnames(error_set) = c("Genotype", "Phenotype", "unique_id")
+
+error_rates = error_set[which(duplicated(error_set %>% 
+  unite(unique_geno, c(1,3), sep = "_", remove = F) %>%
+  pull(unique_geno))),] %>%
+  group_by(Genotype) %>%
+  summarise(pheno_mean = mean(Phenotype),
+            pheno_sd = sd(Phenotype))
+
+## % of SDs for measurements that are less than 1.5-fold threshold
+
+sum(error_rates$pheno_sd*2 <= log10(1.5)) / length(error_rates$pheno_sd)
+
+median(error_rates$pheno_sd*2)
+
+summary(error_rates$pheno_sd*2)
+
+error_rates %>%
+  ggplot(aes(x = pheno_sd*2)) +
+  geom_histogram(bins = 50) +
+  geom_vline(xintercept = log10(1.5), lty = 2) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none")
+```
+We then have to change to the output directory
+
+```{r, setup, include = F}
+knitr::opts_knit$set(root.dir = "/Users/karolbuda/OneDrive - UBC/PhD/Epistasis_Lit/Bulk/Output")
+```
+
 ## Fold-Change Data
 
 Here we look at the fold-change data used in the input files. This allows us to see positive and negative functional effects across the landscapes.
 
 ```{r, message=F}
-fit_land = do.call("rbind", lapply(list.files(pattern="observed_values.csv", recursive = T), read_csv, skip = 1, show_col_types=F, col_names = c("id", "effect", "muts", "2", "3", "enz"))) %>% select(-c('2', '3'))
+fit_land = do.call("rbind", lapply(list.files(pattern="observed_values.csv", recursive = T), read_csv, skip = 1, show_col_types=F, col_names = c("id", "effect", "muts", "junk1", "junk2", "enz"))) %>% dplyr::select(-c('junk1', 'junk2'))
 
 ## Make fit_land have IDs by finding where muts are 0, i.e. start of new dataset, and multiplying
 ## Those values by the folder names to generate ID vector
@@ -48,6 +97,11 @@ The data shows the following distribution
 ```{r}
 c(sum(fit_land$effect < log10(1/1.5)), sum(fit_land$effect >= log10(1/1.5) & fit_land$effect <= log10(1.5)), sum(fit_land$effect > log10(1.5)))
 ```
+And these percentages
+
+```{r}
+c(sum(fit_land$effect < log10(1/1.5)), sum(fit_land$effect >= log10(1/1.5) & fit_land$effect <= log10(1.5)), sum(fit_land$effect > log10(1.5))) / sum(c(sum(fit_land$effect < log10(1/1.5)), sum(fit_land$effect >= log10(1/1.5) & fit_land$effect <= log10(1.5)), sum(fit_land$effect > log10(1.5))))
+```
 
 ### Histogram
 
@@ -65,7 +119,7 @@ fit_land %>%
 
 ## Ratio Data
 
-First we import the ratio datasets, which contains ratio values between predicted function based on the additive model vs observed function. These ratio values serve as a general metric for epistasis.
+First we import the ratio datasets, which contains ratio values between predicted function based on the additive model vs observed function. These ratio values serve as a general metric for "epistasis" as defined by the additive model.
 
 ```{r, message = F}
 
@@ -104,7 +158,7 @@ paste0("Antagonistic ", round(sum(all_ratios$effect < 1/1.5)/length(all_ratios$e
 
 ### Histogram
 
-Shows distribution of positive and negative epistasis across the landscapes 
+Shows distribution of positive and negative epistasis across the landscapes. The significance threshold is 1.5-fold
 
 ```{r}
 all_ratios %>%
@@ -194,7 +248,7 @@ Spread of functional contributions of the positions. This shows whether introduc
 
 ```{r}
 d1 %>%
-  ggplot(aes(x = effects, fill = enzyme)) +
+  ggplot(aes(x = effects)) +
   geom_histogram(bins = 100, alpha = 0.8) +
   geom_vline(xintercept = log10(1.5), lty = 2) +
   geom_vline(xintercept = log10(1/1.5), lty = 2) +
@@ -241,7 +295,7 @@ idio_d %>%
 idio_d %>%
   filter(mutations == "Order 1") %>%
   ggplot(aes(x = idiosync)) +
-  geom_histogram(binwidth = 0.1, fill = "#edae49") +
+  geom_histogram(binwidth = 0.08, fill = "#edae49", color = "black", lwd = 0.1) +
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
   geom_vline(xintercept = log10(2), lty = 2, lwd = 1) +
   geom_vline(xintercept = log10(5), lty = 2, lwd = 1) +
@@ -270,12 +324,39 @@ sum(idio_first > log10(10)) / length(idio_first)
 
 Histogram to show heterogenity at Orders 2, 3, and 4 with the log10 1.5-fold significance threshold
 
+## Order 2
+
 ```{r}
 idio_d %>%
-  filter(mutations == "Order 2" | mutations == "Order 3" | mutations == "Order 4") %>%
+  filter(mutations == "Order 2") %>%
   ggplot(aes(x = idiosync)) +
-  geom_histogram(binwidth = 0.1, fill = "#edae49") +
+  geom_histogram(binwidth = 0.08, fill = "#edae49", color = "black", lwd = 0.1) +
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 1) +
+  labs(x = "Idiosyncrasy Metric",
+       y = "Genotype Count") +
+  facet_wrap(~ mutations) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none",
+        strip.background = element_blank(),
+        strip.text.x = element_blank())
+```
+## Order 3
+
+```{r}
+idio_d %>%
+  filter(mutations == "Order 3") %>%
+  ggplot(aes(x = idiosync)) +
+  geom_histogram(binwidth = 0.08, fill = "#edae49", color = "black", lwd = 0.1) +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 1) +
   labs(x = "Idiosyncrasy Metric",
        y = "Genotype Count") +
   facet_wrap(~ mutations) +
@@ -288,7 +369,30 @@ idio_d %>%
         strip.text.x = element_blank())
 ```
 
-What percentage of positions remain significantly heterogeneous at these orders?
+## Order 4
+
+```{r}
+idio_d %>%
+  filter(mutations == "Order 4") %>%
+  ggplot(aes(x = idiosync)) +
+  geom_histogram(binwidth = 0.08, fill = "#edae49", color = "black", lwd = 0.1) +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 1) +
+  labs(x = "Idiosyncrasy Metric",
+       y = "Genotype Count") +
+  facet_wrap(~ mutations) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none",
+        strip.background = element_blank(),
+        strip.text.x = element_blank())
+```
+
+What percentage of positions remain significantly heterogeneous (1.5-fold) at these orders?
 
 ```{r}
 idio_d %>%
@@ -300,10 +404,31 @@ idio_d %>%
             idiosync = sum(idiosync)/length(idiosync) * 100
             )
 ```
+What percentage of positions remain significantly heterogeneous (1.5-, 2-, 5-, and 10-fold) at these orders?
+
+```{r}
+idio_d %>%
+  filter(mutations == "Order 2" | mutations == "Order 3" | mutations == "Order 4") %>%
+  mutate(idiosync_1.5 = idiosync > log10(1.5),
+         idiosync_2 = idiosync > log10(2),
+         idiosync_5 = idiosync > log10(5),
+         idiosync_10 = idiosync > log10(10)) %>%
+  group_by(mutations) %>%
+  summarise(idiosync_sig_1.5 = sum(idiosync_1.5),
+            idiosync_sig_2 = sum(idiosync_2),
+            idiosync_sig_5 = sum(idiosync_5),
+            idiosync_sig_10 = sum(idiosync_10),
+            idiosync_total = length(idiosync),
+            idiosync_1.5 = sum(idiosync_1.5)/length(idiosync_1.5) * 100,
+            idiosync_2 = sum(idiosync_2)/length(idiosync_2) * 100,
+            idiosync_5 = sum(idiosync_5)/length(idiosync_5) * 100,
+            idiosync_10 = sum(idiosync_10)/length(idiosync_10) * 100
+            )
+```
 
 ## Heterogenity in Sign
 
-Collects all $\Delta$$\Delta$Function data for all orders
+Collects all $\Delta$Function data for all orders
 
 ```{r,message=F}
 higher_order_list = list.files(pattern="higher_box", recursive = T)
@@ -370,7 +495,7 @@ for(each in 1:dim(higher_all_sign_check)[1]){
 higher_all_sign_check$type = factor(types)
 ```
 
-All outputs show position/combination numbers in each catagory, followed by the total sum of all probed positions/combinations at that order, and finally percentages of each category
+All outputs show position/combination numbers in each category, followed by the total sum of all probed positions/combinations at that order, and finally percentages of each category
 
 
 ### Order 1
@@ -423,7 +548,7 @@ summary(order_checker) / length(order_checker) * 100
 
 ## WT points to Mean Deviation
 
-Purpose of this analysis was to determine the difference in $\Delta$$\Delta$Function between the WT-background contribution of a given position/combination and the mean contribution of a given position or combination
+Purpose of this analysis was to determine the difference in $\Delta$Function between the WT-background contribution of a given position/combination and the mean contribution of a given position or combination
 
 # Histogram
 
@@ -445,14 +570,72 @@ for(i in 1:dim(higher_df_mean)[1]) {
 }
 
 devs_df_wt = data.frame(devs = devs, muts = cur_mutations)
+```
+## WT heterogenity for Order 1
 
-## WT heterogenity for higher_orders
-
+```{r}
 devs_df_wt %>%
+  filter(muts == 1) %>%
   ggplot(aes(x = devs)) +
-  geom_histogram(binwidth=0.1, fill = "#edae49") +
+  geom_histogram(binwidth=0.08, fill = "#edae49", color = "black", lwd = 0.1) +
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
-  facet_wrap(~ muts) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 1) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none")
+```
+
+## WT heterogenity for Order 2
+
+```{r}
+devs_df_wt %>%
+  filter(muts == 2) %>%
+  ggplot(aes(x = devs)) +
+  geom_histogram(binwidth=0.08, fill = "#edae49", color = "black", lwd = 0.1) +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 1) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none")
+```
+
+## WT heterogenity for Order 3
+
+```{r}
+devs_df_wt %>%
+  filter(muts == 3) %>%
+  ggplot(aes(x = devs)) +
+  geom_histogram(binwidth=0.1, fill = "#edae49", color = "black", lwd = 0.1) +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 1) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none")
+```
+
+## WT heterogenity for Order 4
+
+```{r}
+devs_df_wt %>%
+  filter(muts == 4) %>%
+  ggplot(aes(x = devs)) +
+  geom_histogram(binwidth=0.1, fill = "#edae49", color = "black", lwd = 0.1) +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 1) +
   theme_classic() +
   theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
         axis.title.y = element_blank(),
@@ -472,9 +655,27 @@ devs_df_wt %>%
 
 ```
 
+Table to show percentages of WT-bg points that deviate from the positional/combinatorial mean by multiple significance threshold (log10 1.5-, 2-, 5-, and 10-fold) 
+
+```{r}
+devs_df_wt %>%
+  mutate(muts = factor(muts)) %>%
+  group_by(muts) %>%
+  summarise(percent_1.5 = sum(devs > log10(1.5)) / length(devs),
+            outlier_1.5 = sum(devs > log10(1.5)),
+            percent_2 = sum(devs > log10(2)) / length(devs),
+            outlier_2 = sum(devs > log10(2)),
+            percent_5 = sum(devs > log10(5)) / length(devs),
+            outlier_5 = sum(devs > log10(5)),
+            percent_10 = sum(devs > log10(10)) / length(devs),
+            outlier_10 = sum(devs > log10(10)),
+            total = length(devs))
+
+```
+
 ## All points to Mean Deviation
 
-Purpose of this analysis was to determine the difference in $\Delta$$\Delta$Function between functional contribution of a given position/combination in any background and the mean contribution of a given position or combination
+Purpose of this analysis was to determine the difference in $\Delta$Function between functional contribution of a given position/combination in any background and the mean contribution of a given position or combination
 
 # Histogram
 
@@ -482,11 +683,6 @@ The spread of all positional contribution vs mean differences for each Order (1-
 
 
 ```{r,message=F}
-higher_df_mean = higher_df %>%
-  filter(mutations < 5) %>%
-  group_by(unique_id) %>%
-  summarise(avg = mean(avg))
-
 devs = c()
 cur_mutations = c()
 for(i in 1:dim(higher_df_mean)[1]) {
@@ -496,14 +692,73 @@ for(i in 1:dim(higher_df_mean)[1]) {
 }
 
 devs_df = data.frame(devs = devs, muts = cur_mutations)
+```
 
-## All heterogenity for higher_orders
+## All heterogenity for Order 1
 
+```{r}
 devs_df %>%
+  filter(muts == 1) %>%
   ggplot(aes(x = devs)) +
-  geom_histogram(binwidth=0.1, fill = "#edae49") +
+  geom_histogram(binwidth=0.08, fill = "#edae49", color = "black", lwd=0.1) +
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
-  facet_wrap(~ muts) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 1) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none")
+```
+
+## All heterogenity for Order 2
+
+```{r}
+devs_df %>%
+  filter(muts == 2) %>%
+  ggplot(aes(x = devs)) +
+  geom_histogram(binwidth=0.08, fill = "#edae49", color = "black", lwd=0.1) +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 1) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none")
+```
+
+## All heterogenity for Order 3
+
+```{r}
+devs_df %>%
+  filter(muts == 3) %>%
+  ggplot(aes(x = devs)) +
+  geom_histogram(binwidth=0.08, fill = "#edae49", color = "black", lwd=0.1) +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 1) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none")
+```
+
+## All heterogenity for Order 4
+
+```{r}
+devs_df %>%
+  filter(muts == 4) %>%
+  ggplot(aes(x = devs)) +
+  geom_histogram(binwidth=0.08, fill = "#edae49", color = "black", lwd=0.1) +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 1) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 1) +
   theme_classic() +
   theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
         axis.title.y = element_blank(),
@@ -523,6 +778,23 @@ devs_df %>%
 
 ```
 
+Table to show percentages of WT-bg points that deviate from the positional/combinatorial mean by many significance thresholds (log10 1.5-, 2-, 5-, and 10-fold) 
+
+```{r}
+devs_df %>%
+  mutate(muts = factor(muts)) %>%
+  group_by(muts) %>%
+  summarise(percent_1.5 = sum(devs > log10(1.5)) / length(devs),
+            outlier_1.5 = sum(devs > log10(1.5)),
+            percent_2 = sum(devs > log10(2)) / length(devs),
+            outlier_2 = sum(devs > log10(2)),
+            percent_5 = sum(devs > log10(5)) / length(devs),
+            outlier_5 = sum(devs > log10(5)),
+            percent_10 = sum(devs > log10(10)) / length(devs),
+            outlier_10 = sum(devs > log10(10)),
+            total = length(devs))
+
+```
 
 # Individual Trends
 
