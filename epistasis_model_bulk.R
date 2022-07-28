@@ -14,7 +14,7 @@ library(htmlwidgets)
 # If updater TRUE, it will run normally
 # If updater FALSE, it will only find files for which folders don't exist
 
-updater = F
+updater = T
 
 ### Inputs ###
 
@@ -27,7 +27,7 @@ inputs = list.files("./Input")
 # Constants
 
 log_base = 10
-transition_threshold = log(1.1, log_base) #fold
+transition_threshold = log(1/1.5, log_base) #fold
 traj_color = "grey"
 color_high = '#ff4e45'
 color_low = '#45d7ff'
@@ -1090,25 +1090,54 @@ higher_order_box = function() {
   final_work$pos = format_pos
   final_work$mutations = muts
   
-  higher_order = final_work %>%
+  first_order = final_work %>%
+    filter(mutations == 1) %>%
     mutate(pos = factor(pos, levels = unique(pos)),
            mutations = paste("Order", mutations)) %>%
     ggplot(aes(x = pos, y = avg, label = genotype)) +
-    geom_point(size = 2.5) +
-    geom_hline(yintercept = 0) +
-    facet_wrap(~ mutations, scales = "free_x") +
-    stat_summary(fun=mean, colour="darkred", geom="crossbar", width=0.2) + 
-    #geom_text_repel(aes(label = genotype), force = 0.5, nudge_x = 0.3, direction = "y", box.padding = 0, segment.size = 0.2, size = 3.5) +
+    geom_boxplot(coef = 6) +
+    geom_jitter(width = 0.2) +
+    geom_hline(yintercept = 0, lwd = 0.5) +
+    geom_hline(yintercept = log10(1.5), lwd = 0.5, lty = 2) +
+    geom_hline(yintercept = log10(1/1.5), lwd = 0.5, lty = 2) +
     theme_classic() +
-    labs(x = "Position", y = expression(Delta*'Functional Fold-Change')) +
-    theme(text = element_text(size=22), axis.text.x = element_text(angle = 60, hjust = 1, vjust = 1, size = 12),
-          axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)),
-          axis.title.x = element_text(margin = margin(t = 20, r = 0, b = 0, l = 0)))
+    labs(x = "Position",
+         y = expression("Functional Contribution ("*Delta*italic("F")*")")) +
+    stat_summary(fun=mean, colour="darkred", geom="crossbar", width=0.2) +
+    scale_x_discrete(guide = guide_axis(angle = 45)) +
+    theme(axis.line = element_line(size = 0.2, color = "black"), 
+          axis.ticks = element_line(size = 0.2, color = "black"), 
+          text = element_text(size = 9), 
+          axis.text = element_text(size = 8, color = "black"))
   
-  ggsave("higher_order_box_plot.svg", plot = higher_order, width = 12, height = 12)
+  ggsave("first_order_box_plot.svg", plot = first_order, width = 180, height = 247/1.5, units = "mm")
   
-  p = ggplotly(higher_order, tooltip = c("label", "avg"))
-  saveWidget(p, "higher_order_box_widget.html")
+  higher_order = final_work %>%
+    filter(mutations > 1) %>%
+    mutate(pos = factor(pos, levels = unique(pos)),
+           mutations = paste("Order", mutations)) %>%
+    ggplot(aes(x = pos, y = avg, label = genotype)) +
+    geom_boxplot(coef = 6) +
+    geom_jitter(width = 0.2, size = 1) +
+    geom_hline(yintercept = 0, lwd = 0.5) +
+    geom_hline(yintercept = log10(1.5), lwd = 0.5, lty = 2) +
+    geom_hline(yintercept = log10(1/1.5), lwd = 0.5, lty = 2) +
+    facet_wrap(~ mutations, scales = "free_x") +
+    theme_classic() +
+    labs(x = "Combination",
+         y = expression("Epistasis ("*epsilon*")")) +
+    stat_summary(fun=mean, colour="darkred", geom="crossbar", width = 0.2) +
+    scale_x_discrete(guide = guide_axis(angle = 45)) +
+    theme(axis.line = element_line(size = 0.2, color = "black"), 
+          axis.ticks = element_line(size = 0.2, color = "black"), 
+          text = element_text(size = 10), 
+          axis.text = element_text(size = 8, color = "black"),
+          axis.text.x = element_text(size = 5))
+  
+  ggsave("higher_order_box_plot.svg", plot = higher_order, width = 180, height = 247/1.5, units = "mm")
+  
+  #p = ggplotly(higher_order, tooltip = c("label", "avg"))
+  #saveWidget(p, "higher_order_box_widget.html")
   
   ## Idiosyncrasy index
   

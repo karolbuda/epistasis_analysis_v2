@@ -93,7 +93,7 @@
 <line x1='523.84' y1='441.10' x2='620.99' y2='315.16' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
 <line x1='528.39' y1='473.87' x2='616.44' y2='539.09' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
 <line x1='520.63' y1='509.02' x2='624.20' y2='317.24' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
-<line x1='524.51' y1='547.99' x2='620.32' y2='663.32' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
+<line x1='524.51' y1='547.99' x2='620.32' y2='663.32' style='stroke-width: 0.75; stroke: #C1C1C1;' />
 <line x1='523.21' y1='580.65' x2='621.62' y2='443.97' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
 <line x1='531.56' y1='591.62' x2='613.27' y2='561.36' style='stroke-width: 0.75; stroke: #C1C1C1;' />
 <line x1='520.21' y1='648.82' x2='624.62' y2='445.81' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
@@ -101,8 +101,8 @@
 <line x1='522.63' y1='720.25' x2='622.20' y2='572.73' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
 <line x1='530.85' y1='729.91' x2='613.98' y2='691.42' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
 <line x1='645.84' y1='189.31' x2='751.03' y2='403.59' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
-<line x1='651.98' y1='313.31' x2='744.89' y2='407.94' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
-<line x1='659.05' y1='424.80' x2='737.81' y2='424.80' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
+<line x1='651.98' y1='313.31' x2='744.89' y2='407.94' style='stroke-width: 0.75; stroke: #C1C1C1;' />
+<line x1='659.05' y1='424.80' x2='737.81' y2='424.80' style='stroke-width: 0.75; stroke: #C1C1C1;' />
 <line x1='651.98' y1='536.29' x2='744.89' y2='441.66' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
 <line x1='645.84' y1='660.29' x2='751.03' y2='446.01' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
 <circle cx='131.36' cy='424.80' r='23.63' style='stroke-width: 0.75; fill: #FFFFFF;' />

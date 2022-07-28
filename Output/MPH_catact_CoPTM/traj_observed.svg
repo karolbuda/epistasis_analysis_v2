@@ -55,7 +55,7 @@
 <line x1='393.09' y1='131.31' x2='499.71' y2='368.25' style='stroke-width: 0.75; stroke: #C1C1C1;' />
 <line x1='404.05' y1='168.30' x2='488.75' y2='121.24' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
 <line x1='404.05' y1='191.24' x2='488.75' y2='238.30' style='stroke-width: 0.75; stroke: #C1C1C1;' />
-<line x1='393.09' y1='201.32' x2='499.71' y2='438.26' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
+<line x1='393.09' y1='201.32' x2='499.71' y2='438.26' style='stroke-width: 0.75; stroke: #C1C1C1;' />
 <line x1='399.20' y1='232.22' x2='493.60' y2='127.32' style='stroke-width: 0.75; stroke: #C1C1C1;' />
 <line x1='404.05' y1='261.25' x2='488.75' y2='308.31' style='stroke-width: 0.75; stroke: #C1C1C1;' />
 <line x1='393.09' y1='271.33' x2='499.71' y2='508.27' style='stroke-width: 0.75; stroke: #C1C1C1;' />
@@ -65,7 +65,7 @@
 <line x1='395.55' y1='369.53' x2='497.25' y2='200.03' style='stroke-width: 0.75; stroke: #C1C1C1;' />
 <line x1='404.05' y1='378.32' x2='488.75' y2='331.26' style='stroke-width: 0.75; stroke: #C1C1C1;' />
 <line x1='393.09' y1='411.34' x2='499.71' y2='648.28' style='stroke-width: 0.75; stroke: #C1C1C1;' />
-<line x1='395.55' y1='439.54' x2='497.25' y2='270.04' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
+<line x1='395.55' y1='439.54' x2='497.25' y2='270.04' style='stroke-width: 0.75; stroke: #C1C1C1;' />
 <line x1='399.20' y1='442.24' x2='493.60' y2='337.35' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />
 <line x1='393.09' y1='481.35' x2='499.71' y2='718.29' style='stroke-width: 0.75; stroke: #C1C1C1;' />
 <line x1='399.20' y1='512.25' x2='493.60' y2='407.36' style='stroke-width: 0.38; stroke: #C1C1C1; stroke-dasharray: 4.00,4.00;' />

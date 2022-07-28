@@ -80,17 +80,17 @@
 <text x='288.88' y='340.71' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
 <text x='288.88' y='517.13' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
 <text x='288.88' y='693.55' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='446.40' y='113.80' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.52</text>
-<text x='446.40' y='239.82' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.74</text>
-<text x='446.40' y='365.84' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.48</text>
-<text x='446.40' y='491.85' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.87</text>
-<text x='446.40' y='617.89' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>15</text>
-<text x='446.40' y='743.88' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.87</text>
-<text x='603.92' y='164.21' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.4</text>
-<text x='603.92' y='340.71' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>14</text>
-<text x='603.92' y='517.05' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.77</text>
-<text x='603.92' y='693.55' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>12</text>
-<text x='761.44' y='428.83' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>13</text>
+<text x='446.40' y='113.80' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.2</text>
+<text x='446.40' y='239.82' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.21</text>
+<text x='446.40' y='365.84' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.24</text>
+<text x='446.40' y='491.85' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.52</text>
+<text x='446.40' y='617.95' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>72</text>
+<text x='446.40' y='743.88' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.54</text>
+<text x='603.92' y='164.21' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='26.99px' lengthAdjust='spacingAndGlyphs'>0.054</text>
+<text x='603.92' y='340.63' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>61</text>
+<text x='603.92' y='517.04' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.38</text>
+<text x='603.92' y='693.46' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>32</text>
+<text x='761.44' y='428.84' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>59</text>
 <text x='131.36' y='458.52' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='23.99px' lengthAdjust='spacingAndGlyphs'>0000</text>
 <text x='288.88' y='193.89' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='23.99px' lengthAdjust='spacingAndGlyphs'>0001</text>
 <text x='288.88' y='370.31' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='23.99px' lengthAdjust='spacingAndGlyphs'>0010</text>
