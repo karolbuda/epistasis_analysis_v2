@@ -12,6 +12,12 @@ The statistical analysis is provided as an R markdown (Rmd) document which can b
 
 ## Nonlinear Transformation Exploration
 
-The nonlin_trans.Rmd file explores the effect of a non-linear transformation and how it can affect interpretability of epistatic data. It was used as a supplementary document in the manuscript.
+The nonlin_trans.Rmd file explores the effect of a non-linear transformation and how it can affect interpretability of epistatic data. It was used as a supplementary file in the manuscript.
+
+## Structural Exploration
+
+The distance_analysis.R script measures the correlation between distances of alpha-carbon atoms in the PDB files, and the associate pairwise epistasis between those positions. It was used to generate the extended data in the manuscript.
+
+---
 
 For more information regarding the script and analyses contact Nobuhiko Tokuriki at tokuriki@msl.ubc.ca
