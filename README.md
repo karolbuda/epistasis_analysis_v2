@@ -2,7 +2,7 @@
 
 This repository represents the analysis hub for the epistatic analysis script. It contains both the bulk analysis script of the raw data, as well as the statistical analysis of the output files.
 
-## Epistais Model Bulk
+## Epistasis Model Bulk
 
 The epistasis_model_bulk.R code requires an Input folder with *.csv* files which specify the WT string, the mutated positions within the protein, then a list of genotype-phenotype pairs with WT-normalized and log10 transformed data in the Phenotype column. The code will generate subdirectories in the Output folder, all of which contain files representative of various analyses for each combinatorial landscape.
 
