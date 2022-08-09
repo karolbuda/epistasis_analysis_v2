@@ -1175,6 +1175,8 @@ general_df %>%
 
 # Prediction
 
+Import the absolute error files for each data set
+
 ```{r, message=F}
 all_mae = lapply(paste0("Output/", list.files(path = "Output", pattern="aic_*", recursive = T)), read_csv, skip = 1, show_col_types=F, col_names = c("MAE", "Last MAE", "Step", "Enzyme", "Linear MAE", "Linear Last MAE"))
 
@@ -1183,6 +1185,12 @@ for(element in 1:length(all_mae)){
 }
 
 all_mae = do.call("rbind", all_mae)
+```
+
+For some reason the absolute error files for OXA-48 CAZ and PIP Traj 1 are including the step 4 model, which uses all 4 of the coefficients in the model for prediction, which is results in a perfect prediction for the WT-background model. I can just remove it manually here
+
+```{r}
+all_mae = all_mae %>% filter(!((ID == "OXA-48_ic50_CAZtraj1" | ID == "OXA-48_ic50_PIPtraj1") & Step == 4))
 ```
 
 Some statistics for the AE for each model. Now _F_ is converted to fold-change in function (but remains WT-normalized)
@@ -1235,7 +1243,7 @@ mae_ggplot
 #ggsave("fig_3B.svg", mae_ggplot, width = 180/2, height = 247/4, dpi = 300, units = "mm")
 ```
 
-This plot omits some data from being viewed, however plotted meeans and medians are accurate. The figure is eddited outside of the code for technical 
+This plot omits some data from being viewed, however plotted means and medians are accurate. The figure is edited outside of the code for technical 
 
 What is the distribution of predicted vs non-predicted at each order, not just the means?
 
@@ -1755,21 +1763,21 @@ access_df = access_df %>% mutate(access_w_mean = access_mean - access,
 
 adaptive_traj_access = cbind(adaptive_traj, access_df)
 
-adaptive_traj_access
+head(adaptive_traj_access)
 ```
 
 What does accessibility look like in adaptive trajectories only?
 
 ```{r}
-adaptive_traj_access %>%
-  filter(likely)
+head(adaptive_traj_access %>%
+  filter(likely))
 ```
 
 And again for non-adaptive trajectories
 
 ```{r}
-adaptive_traj_access %>%
-  filter(!likely)
+head(adaptive_traj_access %>%
+  filter(!likely))
 ```
 
 Now I can ask a variety of questions with this dataset. For example, lets see where epistasis changes node visitation
@@ -1784,7 +1792,7 @@ paste0(dim(adaptive_traj_access %>%
   filter(access != access_no_idio))[1], "/", dim(adaptive_traj_access %>% drop_na())[1])
 ```
 
-How often does epistasis changes node visitation for adaptive trajectories
+How often does epistasis changes node visitation for most likely trajectories
 
 ```{r}
 dim(adaptive_traj_access %>%
@@ -1827,41 +1835,41 @@ paste0(dim(adaptive_traj_access %>%
 Restrictive idiosyncrasy: When negative epistasis prevents node visitation AND mean epistasis would have allowed for it
 
 ```{r}
-adaptive_traj_access %>%
+head(adaptive_traj_access %>%
   drop_na() %>%
-  filter(avg < log10(1/1.5) & access_w_idio < 0 & access_w_mean > 0 & means > 0)
+  filter(avg < log10(1/1.5) & access_w_idio < 0 & access_w_mean > 0 & means > 0))
 ```
 
 What about positive epistasis that does not affect or increases visitation?
 
 ```{r}
-adaptive_traj_access %>%
+head(adaptive_traj_access %>%
   drop_na() %>%
-  filter(avg > log10(1.5) & access_w_idio >= 0)
+  filter(avg > log10(1.5) & access_w_idio >= 0))
 
-adaptive_traj_access %>%
+head(adaptive_traj_access %>%
   drop_na() %>%
-  filter(avg > log10(1.5) & access_w_idio > 0)
+  filter(avg > log10(1.5) & access_w_idio > 0))
 ```
 
 Permissive idiosyncrasy: When positive epistasis enables node visitation AND mean epistasis would have prevented it
 
 ```{r}
-adaptive_traj_access %>%
+head(adaptive_traj_access %>%
   drop_na() %>%
-  filter(avg > log10(1.5) & access_w_idio > 0 & access_w_mean < 0 & means < 0)
+  filter(avg > log10(1.5) & access_w_idio > 0 & access_w_mean < 0 & means < 0))
 ```
 
 Even more interesting are the nodes with are either ENTIRELY accessible or inaccessible due to epistasis
 
 ```{r}
-adaptive_traj_access %>%
+head(adaptive_traj_access %>%
   drop_na() %>%
-  filter(avg > log10(1.5) & access_no_idio == 0 & access > 0)
+  filter(avg > log10(1.5) & access_no_idio == 0 & access > 0))
 
-adaptive_traj_access %>%
+head(adaptive_traj_access %>%
   drop_na() %>%
-  filter(avg < log10(1/1.5) & access_no_idio > 0 & access == 0)
+  filter(avg < log10(1/1.5) & access_no_idio > 0 & access == 0))
 ```
 
 Specific epistasis examples, starting with PTE

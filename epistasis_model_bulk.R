@@ -18,10 +18,6 @@ updater = T
 
 ### Inputs ###
 
-## legacy positive = '#ff4e45'
-## legacy negative = '#45d7ff'
-
-setwd("/Users/karolbuda/OneDrive - UBC/PhD/Epistasis_Lit/__VersionCtrl__/epistasis_analysis_v2")
 inputs = list.files("./Input")
 
 # Constants
