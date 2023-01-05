@@ -1,0 +1,825 @@
+---
+title: "manuscript_output"
+output: html_document
+---
+
+```{r, setup, include=FALSE}
+library(tidyverse)
+library(ggrepel)
+library(ggpubr)
+```
+
+This is the curated version of data, which only includes analyses presented in the manuscript. The order in this markdown file follows the order as seen in the manuscript.
+
+## Loading necessary data
+
+Some data in the exploratory analysis was uploaded and used early on. Though this analysis was not included in the paper, some of the variable names for the datasets are still used. For simplicity, I upload the data here to the variables, but do not provide analysis so as not to complicate this markdown file. If you'd like to explore more deeply, see ```statistical_epistasis_analysis.Rmd```
+
+```{r, loading, message=F, echo=FALSE}
+fit_land = do.call("rbind", lapply(paste0("Output/", list.files(path = "Output", pattern="observed_values.csv", recursive = T)), read_csv, skip = 1, show_col_types=F, col_names = c("id", "effect", "muts", "junk1", "junk2", "enz")))
+
+## Make fit_land have IDs by finding where muts are 0, i.e. start of new dataset, and multiplying
+## Those values by the folder names to generate ID vector
+
+fit_land_spots = c(which(fit_land$muts == 0), (dim(fit_land)[1] + 1)) # Add end of dataset
+fit_land_counts = c()
+
+for(i in 1:(length(fit_land_spots) - 1)) {
+  
+  if(i == 1) {
+    fit_land_counts = c(fit_land_counts, fit_land_spots[i + 1] - 1)
+  } else {
+    fit_land_counts = c(fit_land_counts, fit_land_spots[i + 1] - fit_land_spots[i])
+  }
+
+}
+
+## This assumes folders are read in the order that they are listed
+
+fit_land_ids = rep(str_remove_all(list.files(path = "Output", pattern="observed_values.csv", recursive = T), "/observed_values.csv"), fit_land_counts)
+
+fit_land$unique_id = fit_land_ids
+
+fit_land = fit_land %>% filter(muts != 0)
+
+```
+
+## Main Analysis
+
+### Data pre-processing
+
+This part is done by the ```epistasis_model_bulk_general.R``` script.
+
+### Idiosyncrasy in single mutational effects (SMEs)
+
+Here we import the functional contribution of single positions (not combinations), which resembles first order analysis across all datasets.
+
+```{r, loading_SMEs, message=F, echo=F}
+## Reads all csvs in collated folder and combines them
+
+d = do.call("rbind", lapply(paste0("Output/", list.files(path = "Output", pattern="*2d_box.csv", recursive = T)), read_csv, show_col_types=F, col_names = c("positions", "identity", "mut", "effects", "enzyme", "type", "cond")))
+
+
+d1 = d %>% filter_all(any_vars(!is.na(.))) # removes rows with all NA before making unique ID
+
+d1 = d1 %>%
+  unite("unique_id", c(positions, enzyme, type, cond), remove = F)
+
+d1 = d1 %>%
+  unite("partial_id", c(enzyme, type, cond), remove = F)
+
+```
+
+Spread of functional contributions of the positions. This shows whether introducing a mutation in a given position impacts the function positively or negatively (or neutral) across all backgrounds
+
+```{r, SME-plot, echo=F}
+d1_plot = d1 %>%
+  ggplot(aes(x = effects)) +
+  geom_histogram(bins = 100, alpha = 0.8, color = "black", lwd = 0.1, fill = "#edae49") +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(1/1.5), lty = 2, lwd = 0.2) +
+  theme_classic() +
+  labs(x = expression(Delta*italic("F")), 
+       y = "Genotype Count") +
+  theme(axis.line = element_line(size = 0.2, color = "black"), axis.ticks = element_line(size = 0.2, color = "black"), text = element_text(size = 9), axis.text = element_text(size = 8, color = "black"), legend.position = "none")
+
+
+d1_plot
+
+#ggsave("fig_1A.svg", plot = d1_plot, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+```
+
+#### Spread in SMEs - 2SD
+
+We have `r length(unique(d1$unique_id))` positions.
+
+```{r,SME-spread-load,message=F,echo=F}
+
+idio_d = do.call("rbind", lapply(paste0("Output/", list.files(path = "Output", pattern="idio_df", recursive = T)), read_csv, show_col_types=F))
+
+traj_col = sapply(str_split(list.files(path = "Output", pattern="idio_df", recursive = T), "/"),"[[",1)
+
+traj_col_len = sapply(lapply(paste0("Output/", list.files(path = "Output", pattern="idio_df", recursive = T)), read_csv, show_col_types=F), dim)[1,]
+
+traj_col_full = c()
+for(i in 1:length(traj_col)) {
+  traj_col_full = c(traj_col_full, rep(traj_col[i], traj_col_len[i]))
+}
+
+idio_d$traj = traj_col_full
+```
+
+##### Histogram of 2SD - SMEs
+
+```{r, SME-spread-hist,message=F,echo=F}
+idio_d_order_1 = idio_d %>%
+  filter(mutations == "Order 1") %>%
+  ggplot(aes(x = idiosync)) +
+  geom_histogram(binwidth = 0.08, color = "black", lwd = 0.1, fill = "#edae49") +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 0.2) +
+  labs(x = expression("2"*sigma), 
+       y = "Position Count") +
+  theme_classic() +
+  theme(axis.line = element_line(size = 0.2, color = "black"), axis.ticks = element_line(size = 0.2, color = "black"), text = element_text(size = 9), axis.text = element_text(size = 8, color = "black"), legend.position = "none")
+
+idio_d_order_1
+
+#ggsave("fig_1B.svg", idio_d_order_1, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+```
+
+##### Table of 2SD - SMEs
+
+First order positions which have a heterogeneity index > log10 1.5-fold, 2-fold, 5-fold, and 10-fold for adaptive trajectories
+
+```{r, SME-spread-table,message=F,echo=F}
+idio_d %>%
+  filter(mutations == "Order 1") %>%
+  mutate(idiosync_1.5 = idiosync > log10(1.5),
+         idiosync_2 = idiosync > log10(2),
+         idiosync_5 = idiosync > log10(5),
+         idiosync_10 = idiosync > log10(10)) %>%
+  group_by(mutations) %>%
+  summarise(idiosync_sig_1.5 = sum(idiosync_1.5),
+            idiosync_sig_2 = sum(idiosync_2),
+            idiosync_sig_5 = sum(idiosync_5),
+            idiosync_sig_10 = sum(idiosync_10),
+            idiosync_total = length(idiosync),
+            idiosync_1.5 = sum(idiosync_1.5)/length(idiosync_1.5) * 100,
+            idiosync_2 = sum(idiosync_2)/length(idiosync_2) * 100,
+            idiosync_5 = sum(idiosync_5)/length(idiosync_5) * 100,
+            idiosync_10 = sum(idiosync_10)/length(idiosync_10) * 100
+            ) %>%
+  knitr::kable()
+```
+
+#### Spread in SMEs - sign
+
+First we upload all SME and EE data for sign changing
+
+```{r,sign-load,message=F,echo=F}
+higher_order_list = list.files(path = "Output", pattern="higher_box", recursive = T)
+
+higher_df = data.frame()
+for(higher_file in 1:length(higher_order_list)){
+  Condition = str_split(str_split(higher_order_list[higher_file], "_")[[1]][3], "/")[[1]][1]
+  Measurement = str_split(higher_order_list[higher_file], "_")[[1]][2]
+  Enzyme = str_split(higher_order_list[higher_file], "_")[[1]][1]
+  appending_file = read_csv(paste0("Output/", higher_order_list[higher_file]), show_col_types=F)
+  appending_file$Condition = Condition
+  appending_file$Measurement = Measurement
+  appending_file$Enzyme = Enzyme
+  higher_df = bind_rows(higher_df, appending_file)
+}
+
+
+higher_df = higher_df %>%
+  unite("unique_id", c(pos, Condition, Measurement, Enzyme), remove = F) %>%
+  unite("partial_id", c(Enzyme, Measurement, Condition), remove = F)
+
+higher_all_sign_check = higher_df %>%
+  filter(str_count(genotype, "x")/str_length(genotype) != 1) %>% # Remove interactions with no other backgrounds
+  mutate(mutations = factor(paste("Order", mutations, sep = " "))) %>%
+  group_by(unique_id, mutations) %>%
+  summarise(min_effect = min(avg),
+            max_effect = max(avg))
+
+```
+
+Then, we assigning positive, neutral, negative, negative-neutral, positive-neutral, and negative-positive 'types' based on log10 1.5-fold threshold to every Order
+
+```{r,sign-thresholds,echo=F}
+
+threshold = 1.5
+
+types = c()
+for(each in 1:dim(higher_all_sign_check)[1]){
+  if(higher_all_sign_check$min_effect[each] < log10(1/threshold)){
+    # Negative branch
+    if(higher_all_sign_check$max_effect[each] < log10(1/threshold)) {
+      # Full negative
+      types = c(types, "Negative")
+    } else if(higher_all_sign_check$max_effect[each] <= log10(threshold)) {
+      # Negative Neutral
+      types = c(types, "Neutral Negative")
+    } else {
+      # Negative Positive
+      types = c(types, "Positive Negative")
+    }
+  } else {
+    # Neutral or Positive
+    if(higher_all_sign_check$min_effect[each] > log10(threshold)) {
+      # Full positive
+      types = c(types, "Positive")
+    } else if(higher_all_sign_check$max_effect[each] > log10(threshold)) {
+      # Neutral Positive
+      types = c(types, "Neutral Positive")
+    } else {
+      # Neutral
+      types = c(types, "Neutral")
+    }
+  }
+}
+
+higher_all_sign_check$type = factor(types)
+```
+
+If one chooses to probe the variable ```higher_all_sign_check```, it will show position/combination numbers in each category, followed by the total sum of all probed positions/combinations at that order, and finally percentages of each category
+
+##### Piechart of sign - SMEs
+
+```{r,sign-SME-pie,echo=F}
+order_checker = higher_all_sign_check %>% 
+  filter(mutations == "Order 1") %>%
+  pull(type) 
+
+order_checker_levels = c("Negative", "Neutral", "Positive", "Neutral Negative", "Neutral Positive", "Positive Negative")
+
+pie_df = tibble(names = factor(names(summary(order_checker)), levels = order_checker_levels), values = summary(order_checker))
+
+pie_order_1 = ggplot(pie_df, aes(x="", y=values, fill=names))+ 
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y") +
+  theme_minimal() + 
+  theme(axis.title.x = element_blank(), axis.title.y = element_blank(), panel.border = element_blank(), panel.grid=element_blank(), axis.ticks = element_blank(), plot.title=element_text(size=14, face="bold"))
+
+pie_order_1
+#ggsave("fig_1C.svg", pie_order_1, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+```
+
+Note, the aesthetics of the pie charts were edited elsewhere for publication.
+
+##### Table of sign - SMEs and EEs
+
+Raw Values
+
+```{r,sign-table-raw,echo=F}
+higher_all_sign_check_table = higher_all_sign_check %>% 
+  group_by(mutations) %>%
+  count(type) %>%
+  pivot_wider(names_from = type,
+              values_from = n) %>%
+  mutate(Total = sum(across("Negative":"Positive Negative"))) 
+
+higher_all_sign_check_table %>% knitr::kable()
+```
+
+Percentages
+
+```{r,sign-table-perc,echo=F}
+higher_all_sign_check_table %>%
+  mutate(Negative = Negative/Total*100,
+         Neutral = Neutral/Total*100,
+         `Neutral Negative` = `Neutral Negative`/Total*100,
+         `Neutral Positive` = `Neutral Positive`/Total*100,
+         Positive = Positive/Total*100,
+         `Positive Negative` = `Positive Negative`/Total*100) %>%
+  knitr::kable()
+  
+```
+
+#### Spread in SMEs - wt/mean dev
+
+Purpose of this analysis was to determine the difference in SMEs between the WT-background contribution of a given position/combination and the mean contribution of a given position or combination
+
+First, we load the spread of every positional contribution vs mean differences for SMEs
+
+```{r,wt-dev-load,message=F,echo=F}
+
+## This takes some time to load
+
+higher_df_mean = higher_df %>%
+  filter(mutations < 5) %>%
+  filter(str_count(genotype, "x")/str_length(genotype) != 1) %>% # Remove interactions with no other backgrounds
+  group_by(unique_id, partial_id) %>%
+  summarise(avg = mean(avg))
+
+devs = c()
+sign_devs = c()
+cur_mutations = c()
+for(i in 1:dim(higher_df_mean)[1]) {
+  curr_id = higher_df_mean$unique_id[i]
+  devs = c(devs, abs( (higher_df %>% filter(!str_detect(genotype, "1")) %>% filter(unique_id == curr_id) %>% pull(avg)) - (higher_df_mean$avg[i]) ))
+  cur_mutations = c(cur_mutations, (higher_df %>% filter(!str_detect(genotype, "1")) %>% filter(unique_id == curr_id) %>% pull(mutations)))
+  sign_devs = c(sign_devs, ifelse( (((higher_df %>% filter(!str_detect(genotype, "1")) %>% filter(unique_id == curr_id) %>% pull(avg)) > log10(1.5) & (higher_df_mean$avg[i]) < log10(1/1.5)) | ((higher_df %>% filter(!str_detect(genotype, "1")) %>% filter(unique_id == curr_id) %>% pull(avg)) < log10(1/1.5) & (higher_df_mean$avg[i]) > log10(1.5))), T, F)) ## Check if WT is positive while average is negative or vice versa
+}
+
+
+devs_df_wt = data.frame(devs = devs, muts = cur_mutations, sign_devs = sign_devs)
+
+## Add unique ID if the WT deviates from mean
+
+devs_df_wt = devs_df_wt %>%
+  mutate(unique_id = higher_df_mean$unique_id[row_number()]) %>%
+  mutate(partial_id = higher_df_mean$partial_id[row_number()])
+```
+
+##### Histogram of wt/mean dev - SMEs
+
+```{r,wt-dev-SME-hist,echo=F}
+devs_df_wt_1_plot = devs_df_wt %>%
+  filter(muts == 1) %>%
+  ggplot(aes(x = devs)) +
+  geom_histogram(binwidth=0.08, color = "black", lwd = 0.1, fill = "#edae49") +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 0.2) +
+  labs(x = expression("Deviation from Positional Mean ("*Delta*italic("F")*")"),
+       y = "Position Count") +
+  theme_classic() +
+  theme(axis.line = element_line(size = 0.2, color = "black"), axis.ticks = element_line(size = 0.2, color = "black"), text = element_text(size = 9), axis.text = element_text(size = 8, color = "black"), legend.position = "none")
+
+devs_df_wt_1_plot
+#ggsave("fig_1D.svg", devs_df_wt_1_plot, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+```
+
+In the manuscript, we also briefly mentioned how many WT SMEs have sign deviation (not just magnitude) from the mean at the 1st order? This is in fact `r paste0(round(sum(devs_df_wt %>% filter(muts == 1) %>% pull(sign_devs)) / length(devs_df_wt %>% filter(muts == 1) %>% pull(sign_devs)) * 100, 2), "%")` (`r paste0(length(which(devs_df_wt %>% filter(muts == 1) %>% pull(sign_devs))), "/", length(devs_df_wt %>% filter(muts == 1) %>% pull(sign_devs)))`).
+
+##### Table of wt/mean dev - SMEs
+
+Also, in the supplementary of our paper, we show this table to show percentages of WT-bg points that deviate from the positional/combinatorial mean by multiple significance threshold (log10 1.5-, 2-, 5-, and 10-fold)
+
+```{r,wt-dev-table,echo=F}
+devs_df_wt %>%
+  mutate(Order = factor(muts)) %>%
+  group_by(Order) %>%
+  summarise(percent_1.5 = round(sum(devs > log10(1.5)) / length(devs) *100, 1),
+            outlier_1.5 = sum(devs > log10(1.5)),
+            percent_2 = round(sum(devs > log10(2)) / length(devs) *100, 1),
+            outlier_2 = sum(devs > log10(2)),
+            percent_5 = round(sum(devs > log10(5)) / length(devs) *100, 1),
+            outlier_5 = sum(devs > log10(5)),
+            percent_10 = round(sum(devs > log10(10)) / length(devs) *100, 1), 
+            outlier_10 = sum(devs > log10(10)),
+            total = length(devs)) %>%
+  knitr::kable()
+
+```
+
+As well as the devation of every single SME and EE from the mean, instead of just the wt background. This corresponds to extended data table 4.
+
+```{r,all-dev-load,message=F,echo=F}
+devs = c()
+cur_mutations = c()
+cur_partial_id = c()
+for(i in 1:dim(higher_df_mean)[1]) {
+  curr_id = higher_df_mean$unique_id[i]
+  devs = c(devs, abs( (higher_df %>% filter(unique_id == curr_id) %>% pull(avg)) - (higher_df_mean$avg[i] ) ))
+  cur_mutations = c(cur_mutations, (higher_df %>% filter(unique_id == curr_id) %>% pull(mutations)))
+  cur_partial_id = c(cur_partial_id, (higher_df %>% filter(unique_id == curr_id) %>% pull(partial_id)))
+}
+
+devs_df = data.frame(devs = devs, muts = cur_mutations, partial_id = cur_partial_id)
+```
+
+##### Table of all SME and EE to mean dev (extended data table 4)
+
+```{r,all-dev-table,echo=F}
+devs_df %>%
+  mutate(Order = factor(muts)) %>%
+  group_by(Order) %>%
+  summarise(percent_1.5 = sum(devs > log10(1.5)) / length(devs),
+            outlier_1.5 = sum(devs > log10(1.5)),
+            percent_2 = sum(devs > log10(2)) / length(devs),
+            outlier_2 = sum(devs > log10(2)),
+            percent_5 = sum(devs > log10(5)) / length(devs),
+            outlier_5 = sum(devs > log10(5)),
+            percent_10 = sum(devs > log10(10)) / length(devs),
+            outlier_10 = sum(devs > log10(10)),
+            total = length(devs)) %>%
+  knitr::kable()
+
+```
+
+### Idiosyncrasy in epistatic effects
+
+#### Spread in EEs - 2SD
+
+Histogram to show heterogenity at Orders 2, 3, and 4 with the log10 1.5-fold significance threshold
+
+##### Histogram of 2SD - pairwise
+
+```{r,pairwise-spread-hist,echo=F}
+idio_d_plot_2 = idio_d %>%
+  filter(mutations == "Order 2") %>%
+  ggplot(aes(x = idiosync)) +
+  geom_histogram(fill = "#edae49", color = "black", lwd = 0.1) +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 0.2) +
+  labs(x = expression("log"[10]*" 2"*sigma), 
+       y = "Combination Count") +
+  theme_classic() +
+  theme(axis.line = element_line(size = 0.2, color = "black"), axis.ticks = element_line(size = 0.2, color = "black"), text = element_text(size = 9), axis.text = element_text(size = 8, color = "black"), legend.position = "none")
+
+idio_d_plot_2
+
+#ggsave("fig_2A_1.svg", idio_d_plot_2, width = 180/3, height = 247/4, dpi = 300, units = "mm")
+```
+
+##### Histogram of 2SD - three-way
+
+```{r,three-spread-hist,echo=F}
+idio_d_plot_3 = idio_d %>%
+  filter(mutations == "Order 3") %>%
+  ggplot(aes(x = idiosync)) +
+  geom_histogram(fill = "#edae49", color = "black", lwd = 0.1) +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 0.2) +
+  labs(x = expression("log"[10]*" 2"*sigma), 
+       y = "Combination Count") +
+  theme_classic() +
+  theme(axis.line = element_line(size = 0.2, color = "black"), axis.ticks = element_line(size = 0.2, color = "black"), text = element_text(size = 9), axis.text = element_text(size = 8, color = "black"), legend.position = "none")
+
+idio_d_plot_3
+
+#ggsave("fig_2A_2.svg", idio_d_plot_3, width = 180/3, height = 247/4, dpi = 300, units = "mm")
+```
+
+##### Histogram of 2SD - four-way
+
+```{r,four-spread-hist,echo=F}
+idio_d_plot_4 = idio_d %>%
+  filter(mutations == "Order 4") %>%
+  ggplot(aes(x = idiosync)) +
+  geom_histogram(fill = "#edae49", color = "black", lwd = 0.1) +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 0.2) +
+  labs(x = expression("log"[10]*" 2"*sigma), 
+       y = "Combination Count") +
+  theme_classic() +
+  theme(axis.line = element_line(size = 0.2, color = "black"), axis.ticks = element_line(size = 0.2, color = "black"), text = element_text(size = 9), axis.text = element_text(size = 8, color = "black"), legend.position = "none")
+
+idio_d_plot_4
+
+#ggsave("fig_2A_3.svg", idio_d_plot_4, width = 180/3, height = 247/4, dpi = 300, units = "mm")
+```
+
+##### Table of 2SD in all EEs - Extended data table 1
+
+What percentage of positions remain significantly heterogeneous (1.5-, 2-, 5-, and 10-fold) at all orders?
+
+```{r,all-spread-table,echo=F}
+idio_d %>%
+  filter(mutations == "Order 1" | mutations == "Order 2" | mutations == "Order 3" | mutations == "Order 4") %>%
+  mutate(idiosync_1.5 = idiosync > log10(1.5),
+         idiosync_2 = idiosync > log10(2),
+         idiosync_5 = idiosync > log10(5),
+         idiosync_10 = idiosync > log10(10)) %>%
+  group_by(mutations) %>%
+  summarise(idiosync_sig_1.5 = sum(idiosync_1.5),
+            idiosync_sig_2 = sum(idiosync_2),
+            idiosync_sig_5 = sum(idiosync_5),
+            idiosync_sig_10 = sum(idiosync_10),
+            idiosync_total = length(idiosync),
+            idiosync_1.5 = sum(idiosync_1.5)/length(idiosync_1.5) * 100,
+            idiosync_2 = sum(idiosync_2)/length(idiosync_2) * 100,
+            idiosync_5 = sum(idiosync_5)/length(idiosync_5) * 100,
+            idiosync_10 = sum(idiosync_10)/length(idiosync_10) * 100
+            ) %>%
+  knitr::kable()
+```
+
+#### Spread in EEs - sign
+
+##### Piechart of sign - EE pairiwise
+
+```{r,pairwise-sign-pie,echo=F}
+order_checker = higher_all_sign_check %>% 
+  filter(mutations == "Order 2") %>%
+  pull(type) 
+
+pie_df = tibble(names = factor(names(summary(order_checker)), levels = order_checker_levels), values = summary(order_checker))
+
+pie_order_2 = ggplot(pie_df, aes(x="", y=values, fill=names))+ 
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y") +
+  theme_minimal() + 
+  theme(axis.title.x = element_blank(), axis.title.y = element_blank(), panel.border = element_blank(), panel.grid=element_blank(), axis.ticks = element_blank(), plot.title=element_text(size=14, face="bold"))
+
+pie_order_2
+#ggsave("fig_2B_1.svg", pie_order_2, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+```
+
+##### Piechart of sign - EE three-way
+
+```{r,three-sign-pie,echo=F}
+order_checker = higher_all_sign_check %>% 
+  filter(mutations == "Order 3") %>%
+  pull(type) 
+
+pie_df = tibble(names = factor(names(summary(order_checker)), levels = order_checker_levels), values = summary(order_checker))
+
+pie_order_3 = ggplot(pie_df, aes(x="", y=values, fill=names))+ 
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y") +
+  theme_minimal() + 
+  theme(axis.title.x = element_blank(), axis.title.y = element_blank(), panel.border = element_blank(), panel.grid=element_blank(), axis.ticks = element_blank(), plot.title=element_text(size=14, face="bold"))
+
+pie_order_3
+
+#ggsave("fig_2B_2.svg", pie_order_3, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+```
+
+##### Piechart of sign - EE four-way
+
+```{r,four-sign-pie,echo=F}
+order_checker = higher_all_sign_check %>% 
+  filter(mutations == "Order 4") %>%
+  pull(type) 
+
+pie_df = tibble(names = factor(names(summary(order_checker)), levels = order_checker_levels), values = summary(order_checker))
+
+pie_order_4 = ggplot(pie_df, aes(x="", y=values, fill=names))+ 
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y") +
+  theme_minimal() + 
+  theme(axis.title.x = element_blank(), axis.title.y = element_blank(), panel.border = element_blank(), panel.grid=element_blank(), axis.ticks = element_blank(), plot.title=element_text(size=14, face="bold"))
+
+pie_order_4
+
+#ggsave("fig_2B_3.svg", pie_order_4, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+```
+
+#### Spread in EEs - wt/mean dev
+
+##### Histogram of wt/mean dev - pairwise EEs
+
+```{r,pairwise-wtdev-hist,echo=F}
+devs_df_wt_2 = devs_df_wt %>%
+  filter(muts == 2) %>%
+  ggplot(aes(x = devs)) +
+  geom_histogram(binwidth=0.08, color = "black", lwd = 0.1, fill = "#edae49") +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 0.2) +
+  theme_classic() +
+  #scale_x_continuous(limits = c(0, 3)) +
+  labs(x = expression("Deviation from Combinatorial Mean (log"[10]*" "*epsilon*")"),
+       y = "Combination Count") +
+  theme(axis.line = element_line(size = 0.2, color = "black"), axis.ticks = element_line(size = 0.2, color = "black"), text = element_text(size = 9), axis.text = element_text(size = 8, color = "black"), legend.position = "none")
+
+devs_df_wt_2
+
+#ggsave("fig_sup_4B_1.svg", devs_df_wt_2, width = 180/3, height = 247/4, dpi = 300, units = "mm")
+```
+
+##### Histogram of wt/mean dev - three-way EEs
+
+```{r,three-wtdev-hist,echo=F}
+devs_df_wt_3 = devs_df_wt %>%
+  filter(muts == 3) %>%
+  ggplot(aes(x = devs)) +
+  geom_histogram(binwidth=0.08, color = "black", lwd = 0.1, fill = "#edae49") +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 0.2) +
+  #scale_x_continuous(limits = c(0, 3)) +
+  theme_classic() +
+  labs(x = expression("Deviation from Combinatorial Mean (log"[10]*" "*epsilon*")"),
+       y = "Combination Count") +
+  theme(axis.line = element_line(size = 0.2, color = "black"), axis.ticks = element_line(size = 0.2, color = "black"), text = element_text(size = 9), axis.text = element_text(size = 8, color = "black"), legend.position = "none")
+
+devs_df_wt_3
+
+#ggsave("fig_sup_4B_2.svg", devs_df_wt_3, width = 180/3, height = 247/4, dpi = 300, units = "mm")
+```
+
+##### Histogram of wt/mean dev - four-way EEs
+
+```{r,four-wtdev-hist,echo=F}
+devs_df_wt_4 = devs_df_wt %>%
+  filter(muts == 4) %>%
+  ggplot(aes(x = devs)) +
+  geom_histogram(binwidth=0.08, color = "black", lwd = 0.1, fill = "#edae49") +
+  geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
+  geom_vline(xintercept = log10(10), lty = 2, lwd = 0.2) +
+  theme_classic() +
+  #scale_x_continuous(limits = c(0, 3)) + # Same scale used later
+  labs(x = expression("Deviation from Combinatorial Mean (log"[10]*" "*epsilon*")"),
+       y = "Combination Count") +
+  theme(axis.line = element_line(size = 0.2, color = "black"), axis.ticks = element_line(size = 0.2, color = "black"), text = element_text(size = 9), axis.text = element_text(size = 8, color = "black"), legend.position = "none")
+
+devs_df_wt_4
+
+#ggsave("fig_sup_4B_3.svg", devs_df_wt_4, width = 180/3, height = 247/4, dpi = 300, units = "mm")
+```
+
+Like the SMEs, we checked whether there is a sign deviation between the wt EE and mean EE at each order of interaction. For pairwise we saw `r paste0(length(which(devs_df_wt %>% filter(muts == 2) %>% pull(sign_devs))), "/", length(devs_df_wt %>% filter(muts == 2) %>% pull(sign_devs)))` (`r paste0(round(sum(devs_df_wt %>% filter(muts == 2) %>% pull(sign_devs)) / length(devs_df_wt %>% filter(muts == 2) %>% pull(sign_devs)) * 100, 2), "%") `). For three-way we saw `r paste0(length(which(devs_df_wt %>% filter(muts == 3) %>% pull(sign_devs))), "/", length(devs_df_wt %>% filter(muts == 3) %>% pull(sign_devs)))` (`r paste0(round(sum(devs_df_wt %>% filter(muts == 3) %>% pull(sign_devs)) / length(devs_df_wt %>% filter(muts == 3) %>% pull(sign_devs)) * 100, 2), "%")`). For four-way we saw `r paste0(length(which(devs_df_wt %>% filter(muts == 4) %>% pull(sign_devs))), "/", length(devs_df_wt %>% filter(muts == 4) %>% pull(sign_devs)))` (`r paste0(round(sum(devs_df_wt %>% filter(muts == 4) %>% pull(sign_devs)) / length(devs_df_wt %>% filter(muts == 4) %>% pull(sign_devs)) * 100, 2), "%")`).
+
+### Network rewiring
+
+First we load the required data for network rewiring exploration, as well as establish filters for adaptive trajectories and 'mechanistic' trajectories.
+
+```{r,helper-functions,echo=F}
+is.in = function(value, list) {
+  if(dim(value[[1]])[1] == 0){
+    return(rep(TRUE, length(list)))
+  } else {
+    hits = c()
+    for(i in 1:length(list)) {
+      hits = c(hits, ifelse(all(value[[1]][,1] %in% list[[i]][,1]), TRUE, FALSE))
+    }
+    return(hits)
+  }
+}
+
+':=' <- function(lhs, rhs) {
+  frame <- parent.frame()
+  lhs <- as.list(substitute(lhs))
+  if (length(lhs) > 1)
+    lhs <- lhs[-1]
+  if (length(lhs) == 1) {
+    do.call(`=`, list(lhs[[1]], rhs), envir=frame)
+    return(invisible(NULL)) 
+  }
+  if (is.function(rhs) || is(rhs, 'formula'))
+    rhs <- list(rhs)
+  if (length(lhs) > length(rhs))
+    rhs <- c(rhs, rep(list(NULL), length(lhs) - length(rhs)))
+  for (i in 1:length(lhs))
+    do.call(`=`, list(lhs[[i]], rhs[[i]]), envir=frame)
+  return(invisible(NULL)) 
+  # https://stackoverflow.com/questions/1826519/how-to-assign-from-a-function-which-returns-more-than-one-value
+}
+
+str_detect_any = function(string, pattern){
+  all_detects = c()
+  for(i in 1:length(string)) {
+    curr_detects = c()
+    for(j in 1:length(pattern)) {
+      curr_detects = c(curr_detects, str_detect(string[i], pattern[j]))
+    }
+    all_detects = c(all_detects, any(curr_detects))
+  }
+  return(all_detects)
+}
+
+str_detect_all = function(string, pattern){
+  all_detects = c()
+  for(i in 1:length(string)) {
+    curr_detects = c()
+    for(j in 1:length(pattern)) {
+      curr_detects = c(curr_detects, str_detect(string[i], pattern[j]))
+    }
+    all_detects = c(all_detects, all(curr_detects))
+  }
+  return(all_detects)
+}
+
+```
+
+```{r,net-re-load,echo=F}
+
+# Takes a very long time
+
+higher_df_diminish = higher_df %>%
+  unite("partial_id", c(Enzyme, Measurement, Condition)) %>%
+  #filter(mutations == 1) %>%
+  mutate(from = str_replace_all(genotype, "x", "0"),
+         to = str_replace_all(genotype, "x", "1"))
+
+start_effect = c()
+for(i in 1:dim(higher_df_diminish)[1]) {
+  
+  if(!str_detect(higher_df_diminish$from[i], "1")) {
+    start_effect = c(start_effect, 0) # If starts from WT, start effect is 0
+  } else {
+    start_effect = c(start_effect, filter(fit_land, unique_id == higher_df_diminish$partial_id[i] & id == higher_df_diminish$from[i]) 
+                     %>% pull(effect))
+  }
+}
+
+higher_df_diminish$start_effect = start_effect
+#higher_df_diminish$end_effect = higher_df_diminish %>% mutate(end_effect = start_effect + avg) %>% pull(end_effect)
+# This doesn't work for higher-order genotypes
+
+###
+
+adaptive_trajectories = c("DHFR_ki_trajg", 
+                          "DHFR_ki_trajr",
+                          "MPH_catact_ZnPTM",
+                          "NfsA_ec50_2039",
+                          "NfsA_ec50_3637",
+                          "OXA-48_ic50_CAZtraj1",
+                          "OXA-48_ic50_CAZtraj2",
+                          "OXA-48_ic50_CAZtraj3",
+                          "PTE_catact_2NH",
+                          "TEM_MIC_weinreich",
+                          "DHFR_ic75_palmer")
+
+mechanistic_trajectory_filters = c("catef", 
+                          "kcat",
+                          "ki",
+                          "catact")
+
+```
+
+Then we look at how many network rewiring events there are.
+
+```{r, network-rewiring, echo=F}
+
+net_re = higher_df_diminish %>% 
+  filter(mutations == 1,
+         str_detect_any(partial_id, mechanistic_trajectory_filters)) %>% 
+  select(partial_id, from, to) %>%
+  filter(str_count(from, "1") > 1)
+
+before = c()
+after = c()
+for(entry in 1:dim(net_re)[1]) {
+  f = str_replace_all(net_re$from[entry], "1", "x")
+  t = str_replace_all(net_re$to[entry], "1", "x")
+  before = c(before, higher_df_diminish %>% 
+    filter(partial_id == net_re[entry,]$partial_id,
+           genotype == f) %>% pull(avg)) 
+  after = c(after, higher_df_diminish %>% 
+               filter(partial_id == net_re[entry,]$partial_id,
+                      genotype == t) %>% pull(avg)) 
+}
+
+net_re$before = before
+net_re$after = after
+
+# Which lower order genos are off limits
+net_re %>%
+  count("epistasis at lower-order?" = abs(before) > log10(1.5),
+        "epistasis at higher-order?" = abs(after) > log10(1.5)) %>%
+  mutate(percentage = n/sum(n) *100) %>%
+  knitr::kable()
+```
+
+Of the rewired, how many are constructive and how many are destructive?
+
+```{r,network-rewiring-type-table,echo=F}
+# How many constructive and dispruptive rewiring events
+net_re %>%
+  filter(abs(before) > log10(1.5),
+         abs(after) > log10(1.5)) %>%
+  mutate(event_type = ifelse(sign(before) == sign(after), "constructive", "disruptive")) %>%
+  count(event_type) %>%
+  mutate(percentage = n/sum(n)*100) %>%
+  knitr::kable()
+```
+
+### Molecular basis
+
+This analysis was bespoke, but surveying all network rewiring events manually and selecting genotypes along adaptive trajectories. 
+
+## Supplementary
+
+### Error-rate assessment
+
+Take all the input files, attach their unique_id, find the ones with replicates, then look at the median of 2*SD (~95% spread around measurement mean) for all measurements to decided on an approriate significance threshold
+
+```{r}
+file_vector = str_remove(list.files(path = "Input", pattern="*.csv", recursive = T), ".csv")
+
+error_set = lapply(paste0("Input/", list.files(path = "Input", pattern="*.csv", recursive = T)), read_csv, skip = 5, col_names = F, col_select = 1:2, show_col_types=F)
+
+for(i in 1:length(error_set)){
+  error_set[[i]][,3] = file_vector[i]
+}
+
+error_set = do.call("rbind", error_set)
+
+colnames(error_set) = c("Genotype", "Phenotype", "unique_id")
+
+error_rates = error_set[which(duplicated(error_set %>% 
+  unite(unique_geno, c(1,3), sep = "_", remove = F) %>%
+  pull(unique_geno))),] %>%
+  group_by(Genotype) %>%
+  summarise(pheno_mean = mean(Phenotype),
+            pheno_sd = sd(Phenotype))
+
+## % of SDs for measurements that are less than 1.5-fold threshold
+
+sum(error_rates$pheno_sd*2 <= log10(1.5)) / length(error_rates$pheno_sd)
+
+median(error_rates$pheno_sd*2)
+
+summary(error_rates$pheno_sd*2)
+
+error_rates %>%
+  ggplot(aes(x = pheno_sd*2)) +
+  geom_histogram(bins = 50) +
+  geom_vline(xintercept = log10(1.5), lty = 2) +
+  theme_classic() +
+  theme(text = element_text(size=18), axis.text = element_text(size = 16, color = "black"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = "none")
+```
+

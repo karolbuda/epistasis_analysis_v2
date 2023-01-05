@@ -5,7 +5,6 @@ output: html_document
 
 ```{r, setup, include=FALSE}
 library(tidyverse)
-library(ggExtra)
 library(ggrepel)
 library(ggpubr)
 ```
@@ -456,15 +455,6 @@ idio_d %>%
 ### Order 2-4
 
 Histogram to show heterogenity at Orders 2, 3, and 4 with the log10 1.5-fold significance threshold
-
-First we set up the ggbreak library for x-axis breaks
-
-```{r}
-library(ggbreak)
-
-# Reference
-# S Xu#, M Chen#, T Feng, L Zhan, L Zhou, G Yu*. Use ggbreak to effectively utilize plotting space to deal with large datasets and outliers. Frontiers in Genetics. 2021, 12:774846. doi: 10.3389/fgene.2021.774846
-```
 
 ## Order 2
 
@@ -1486,7 +1476,6 @@ adaptive_traj_plot = adaptive_traj %>%
   pivot_longer(c(wt_bg, means)) %>%
   ggplot(aes(x = factor(mutations), y = value, fill = name)) +
   geom_bar(stat = "identity", position = position_dodge()) +
-  #geom_text_repel(aes(label = genotype), force = 1.5, direction = "y", box.padding = 0, segment.size = 0.2, size = 2.5) +
   geom_hline(yintercept = log10(1.5), lty = 2, size = 0.2) +
   geom_hline(yintercept = log10(1/1.5), lty = 2, size = 0.2) +
   geom_hline(yintercept = 0) +

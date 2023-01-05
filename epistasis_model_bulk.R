@@ -1,14 +1,10 @@
 ### Library ###
 
 library(tidyverse)
-library(ggrepel) ## For repelling labels on ggplot
 library(igraph) ## Network library
 library(gtools) ## Permutation library
 library(e1071) ## Hamming distance lib
 library(svglite) ## SVG file export
-library(ggpubr) ## Publication ready ggplot plotting
-library(plotly) ## Interactive plotting
-library(htmlwidgets)
 
 ### Update ###
 # If updater TRUE, it will run normally
@@ -187,7 +183,6 @@ epistasis_analysis = function() {
   stat_plot = ggplot(pos_out[-1,], aes(x = indices, y = effect)) +
     geom_hline(yintercept = 0) +
     geom_bar(stat="identity", fill = traj_color, color = "black") +
-    #geom_text(aes(label=formatC(effect, digits=2), y = effect + 0.1*sign(effect)*abs(max(effect))), size = 3) +
     facet_wrap(~ order, scales = "free_x") + 
     labs(x = "Mutation(s)", y = "Fold Effect on Activity") +
     theme_classic() +
@@ -1131,9 +1126,6 @@ higher_order_box = function() {
           axis.text.x = element_text(size = 5))
   
   ggsave("higher_order_box_plot.svg", plot = higher_order, width = 180, height = 247/1.5, units = "mm")
-  
-  #p = ggplotly(higher_order, tooltip = c("label", "avg"))
-  #saveWidget(p, "higher_order_box_widget.html")
   
   ## Idiosyncrasy index
   
