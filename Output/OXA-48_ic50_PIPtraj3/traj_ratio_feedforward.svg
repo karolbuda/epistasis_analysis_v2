@@ -9,6 +9,9 @@
       stroke-linejoin: round;
       stroke-miterlimit: 10.00;
     }
+    .svglite text {
+      white-space: pre;
+    }
   ]]></style>
 </defs>
 <rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
@@ -283,133 +286,133 @@
 <circle cx='773.61' cy='424.80' r='11.45' style='stroke-width: 0.75; fill: #45D7FF;' />
 </g>
 <g clip-path='url(#cpMC4wMHw4NjQuMDB8MC4wMHw4NjQuMDA=)'>
-<text x='119.19' y='428.92' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='228.26' y='170.60' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='228.26' y='273.93' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='228.26' y='377.26' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='228.26' y='480.59' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='228.26' y='583.92' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='228.26' y='687.25' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='337.33' y='112.39' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.54</text>
-<text x='337.33' y='157.60' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.8</text>
-<text x='337.33' y='202.80' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>39</text>
-<text x='337.33' y='248.01' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.47</text>
-<text x='337.33' y='293.22' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.97</text>
-<text x='337.33' y='338.42' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.3</text>
-<text x='337.33' y='383.63' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.29</text>
-<text x='337.33' y='428.84' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.67</text>
-<text x='337.33' y='474.05' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.75</text>
-<text x='337.33' y='519.25' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.35</text>
-<text x='337.33' y='564.46' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.34</text>
-<text x='337.33' y='609.67' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.42</text>
-<text x='337.33' y='654.88' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.67</text>
-<text x='337.33' y='700.08' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.63</text>
-<text x='337.33' y='745.29' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.46</text>
-<text x='446.40' y='101.63' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='26.99px' lengthAdjust='spacingAndGlyphs'>0.075</text>
-<text x='446.40' y='136.06' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>3.2</text>
-<text x='446.40' y='170.51' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.8</text>
-<text x='446.40' y='204.95' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='26.99px' lengthAdjust='spacingAndGlyphs'>0.032</text>
-<text x='446.40' y='239.40' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>7.9</text>
-<text x='446.40' y='273.84' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>3.4</text>
-<text x='446.40' y='308.29' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='26.99px' lengthAdjust='spacingAndGlyphs'>0.069</text>
-<text x='446.40' y='342.73' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>8.5</text>
-<text x='446.40' y='377.18' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>4.9</text>
-<text x='446.40' y='411.70' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text x='446.40' y='446.08' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>7</text>
-<text x='446.40' y='480.51' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>4.7</text>
-<text x='446.40' y='514.95' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='26.99px' lengthAdjust='spacingAndGlyphs'>0.085</text>
-<text x='446.40' y='549.39' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.5</text>
-<text x='446.40' y='583.84' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.4</text>
-<text x='446.40' y='618.28' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.5</text>
-<text x='446.40' y='652.73' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>4.9</text>
-<text x='446.40' y='687.16' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>3.9</text>
-<text x='446.40' y='721.61' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.8</text>
-<text x='446.40' y='756.04' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>3.7</text>
-<text x='555.47' y='112.39' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>7.1</text>
-<text x='555.47' y='157.60' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.2</text>
-<text x='555.47' y='202.80' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='26.99px' lengthAdjust='spacingAndGlyphs'>0.034</text>
-<text x='555.47' y='248.01' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.11</text>
-<text x='555.47' y='293.22' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>6.8</text>
-<text x='555.47' y='338.51' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text x='555.47' y='383.63' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.19</text>
-<text x='555.47' y='428.84' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.19</text>
-<text x='555.47' y='474.05' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>10</text>
-<text x='555.47' y='519.25' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='26.99px' lengthAdjust='spacingAndGlyphs'>0.055</text>
-<text x='555.47' y='564.46' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.17</text>
-<text x='555.47' y='609.67' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>5.2</text>
-<text x='555.47' y='654.88' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.17</text>
-<text x='555.47' y='700.08' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.13</text>
-<text x='555.47' y='745.28' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.31</text>
-<text x='664.54' y='170.51' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.8</text>
-<text x='664.54' y='273.84' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.72</text>
-<text x='664.54' y='377.17' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.6</text>
-<text x='664.54' y='480.50' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>31</text>
-<text x='664.54' y='583.83' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>13</text>
-<text x='664.54' y='687.16' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.35</text>
-<text x='773.61' y='428.84' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: Times;' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.15</text>
-<text x='119.19' y='445.37' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000000</text>
-<text x='228.26' y='187.04' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000001</text>
-<text x='228.26' y='290.37' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000010</text>
-<text x='228.26' y='393.70' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000100</text>
-<text x='228.26' y='497.03' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001000</text>
-<text x='228.26' y='600.36' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010000</text>
-<text x='228.26' y='703.69' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100000</text>
-<text x='337.33' y='128.92' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000011</text>
-<text x='337.33' y='174.12' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000101</text>
-<text x='337.33' y='219.33' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000110</text>
-<text x='337.33' y='264.54' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001001</text>
-<text x='337.33' y='309.74' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001010</text>
-<text x='337.33' y='354.95' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001100</text>
-<text x='337.33' y='400.16' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010001</text>
-<text x='337.33' y='445.37' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010010</text>
-<text x='337.33' y='490.57' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010100</text>
-<text x='337.33' y='535.78' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011000</text>
-<text x='337.33' y='580.99' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100001</text>
-<text x='337.33' y='626.20' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100010</text>
-<text x='337.33' y='671.40' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100100</text>
-<text x='337.33' y='716.61' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101000</text>
-<text x='337.33' y='761.82' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110000</text>
-<text x='446.40' y='118.15' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000111</text>
-<text x='446.40' y='152.60' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001011</text>
-<text x='446.40' y='187.04' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001101</text>
-<text x='446.40' y='221.48' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001110</text>
-<text x='446.40' y='255.93' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010011</text>
-<text x='446.40' y='290.37' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010101</text>
-<text x='446.40' y='324.81' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010110</text>
-<text x='446.40' y='359.26' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011001</text>
-<text x='446.40' y='393.70' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011010</text>
-<text x='446.40' y='428.14' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011100</text>
-<text x='446.40' y='462.59' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100011</text>
-<text x='446.40' y='497.03' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100101</text>
-<text x='446.40' y='531.48' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100110</text>
-<text x='446.40' y='565.92' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101001</text>
-<text x='446.40' y='600.36' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101010</text>
-<text x='446.40' y='634.81' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101100</text>
-<text x='446.40' y='669.25' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110001</text>
-<text x='446.40' y='703.69' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110010</text>
-<text x='446.40' y='738.14' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110100</text>
-<text x='446.40' y='772.58' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111000</text>
-<text x='555.47' y='128.92' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001111</text>
-<text x='555.47' y='174.12' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010111</text>
-<text x='555.47' y='219.33' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011011</text>
-<text x='555.47' y='264.54' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011101</text>
-<text x='555.47' y='309.74' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011110</text>
-<text x='555.47' y='354.95' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100111</text>
-<text x='555.47' y='400.16' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101011</text>
-<text x='555.47' y='445.37' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101101</text>
-<text x='555.47' y='490.57' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101110</text>
-<text x='555.47' y='535.78' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110011</text>
-<text x='555.47' y='580.99' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110101</text>
-<text x='555.47' y='626.20' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110110</text>
-<text x='555.47' y='671.40' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111001</text>
-<text x='555.47' y='716.61' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111010</text>
-<text x='555.47' y='761.82' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111100</text>
-<text x='664.54' y='187.04' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011111</text>
-<text x='664.54' y='290.37' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101111</text>
-<text x='664.54' y='393.70' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110111</text>
-<text x='664.54' y='497.03' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111011</text>
-<text x='664.54' y='600.36' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111101</text>
-<text x='664.54' y='703.69' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111110</text>
-<text x='773.61' y='445.41' text-anchor='middle' style='font-size: 12.00px; font-family: Times;' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111111</text>
+<text x='119.19' y='428.92' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='228.26' y='170.60' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='228.26' y='273.93' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='228.26' y='377.26' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='228.26' y='480.59' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='228.26' y='583.92' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='228.26' y='687.25' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='337.33' y='112.39' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.54</text>
+<text x='337.33' y='157.60' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.8</text>
+<text x='337.33' y='202.80' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>39</text>
+<text x='337.33' y='248.01' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.47</text>
+<text x='337.33' y='293.22' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.97</text>
+<text x='337.33' y='338.42' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.3</text>
+<text x='337.33' y='383.63' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.29</text>
+<text x='337.33' y='428.84' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.67</text>
+<text x='337.33' y='474.05' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.75</text>
+<text x='337.33' y='519.25' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.35</text>
+<text x='337.33' y='564.46' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.34</text>
+<text x='337.33' y='609.67' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.42</text>
+<text x='337.33' y='654.88' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.67</text>
+<text x='337.33' y='700.08' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.63</text>
+<text x='337.33' y='745.29' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.46</text>
+<text x='446.40' y='101.63' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='26.99px' lengthAdjust='spacingAndGlyphs'>0.075</text>
+<text x='446.40' y='136.06' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>3.2</text>
+<text x='446.40' y='170.51' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.8</text>
+<text x='446.40' y='204.95' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='26.99px' lengthAdjust='spacingAndGlyphs'>0.032</text>
+<text x='446.40' y='239.40' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>7.9</text>
+<text x='446.40' y='273.84' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>3.4</text>
+<text x='446.40' y='308.29' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='26.99px' lengthAdjust='spacingAndGlyphs'>0.069</text>
+<text x='446.40' y='342.73' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>8.5</text>
+<text x='446.40' y='377.18' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>4.9</text>
+<text x='446.40' y='411.70' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='446.40' y='446.08' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>7</text>
+<text x='446.40' y='480.51' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>4.7</text>
+<text x='446.40' y='514.95' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='26.99px' lengthAdjust='spacingAndGlyphs'>0.085</text>
+<text x='446.40' y='549.39' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.5</text>
+<text x='446.40' y='583.84' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.4</text>
+<text x='446.40' y='618.28' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.5</text>
+<text x='446.40' y='652.73' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>4.9</text>
+<text x='446.40' y='687.16' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>3.9</text>
+<text x='446.40' y='721.61' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.8</text>
+<text x='446.40' y='756.04' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>3.7</text>
+<text x='555.47' y='112.39' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>7.1</text>
+<text x='555.47' y='157.60' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.2</text>
+<text x='555.47' y='202.80' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='26.99px' lengthAdjust='spacingAndGlyphs'>0.034</text>
+<text x='555.47' y='248.01' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.11</text>
+<text x='555.47' y='293.22' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>6.8</text>
+<text x='555.47' y='338.51' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='555.47' y='383.63' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.19</text>
+<text x='555.47' y='428.84' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.19</text>
+<text x='555.47' y='474.05' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>10</text>
+<text x='555.47' y='519.25' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='26.99px' lengthAdjust='spacingAndGlyphs'>0.055</text>
+<text x='555.47' y='564.46' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.17</text>
+<text x='555.47' y='609.67' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>5.2</text>
+<text x='555.47' y='654.88' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.17</text>
+<text x='555.47' y='700.08' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.13</text>
+<text x='555.47' y='745.28' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.31</text>
+<text x='664.54' y='170.51' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.8</text>
+<text x='664.54' y='273.84' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.72</text>
+<text x='664.54' y='377.17' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.6</text>
+<text x='664.54' y='480.50' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>31</text>
+<text x='664.54' y='583.83' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='12.00px' lengthAdjust='spacingAndGlyphs'>13</text>
+<text x='664.54' y='687.16' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.35</text>
+<text x='773.61' y='428.84' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Times";' textLength='21.00px' lengthAdjust='spacingAndGlyphs'>0.15</text>
+<text x='119.19' y='445.37' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000000</text>
+<text x='228.26' y='187.04' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000001</text>
+<text x='228.26' y='290.37' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000010</text>
+<text x='228.26' y='393.70' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000100</text>
+<text x='228.26' y='497.03' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001000</text>
+<text x='228.26' y='600.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010000</text>
+<text x='228.26' y='703.69' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100000</text>
+<text x='337.33' y='128.92' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000011</text>
+<text x='337.33' y='174.12' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000101</text>
+<text x='337.33' y='219.33' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000110</text>
+<text x='337.33' y='264.54' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001001</text>
+<text x='337.33' y='309.74' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001010</text>
+<text x='337.33' y='354.95' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001100</text>
+<text x='337.33' y='400.16' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010001</text>
+<text x='337.33' y='445.37' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010010</text>
+<text x='337.33' y='490.57' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010100</text>
+<text x='337.33' y='535.78' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011000</text>
+<text x='337.33' y='580.99' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100001</text>
+<text x='337.33' y='626.20' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100010</text>
+<text x='337.33' y='671.40' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100100</text>
+<text x='337.33' y='716.61' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101000</text>
+<text x='337.33' y='761.82' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110000</text>
+<text x='446.40' y='118.15' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>000111</text>
+<text x='446.40' y='152.60' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001011</text>
+<text x='446.40' y='187.04' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001101</text>
+<text x='446.40' y='221.48' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001110</text>
+<text x='446.40' y='255.93' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010011</text>
+<text x='446.40' y='290.37' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010101</text>
+<text x='446.40' y='324.81' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010110</text>
+<text x='446.40' y='359.26' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011001</text>
+<text x='446.40' y='393.70' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011010</text>
+<text x='446.40' y='428.14' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011100</text>
+<text x='446.40' y='462.59' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100011</text>
+<text x='446.40' y='497.03' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100101</text>
+<text x='446.40' y='531.48' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100110</text>
+<text x='446.40' y='565.92' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101001</text>
+<text x='446.40' y='600.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101010</text>
+<text x='446.40' y='634.81' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101100</text>
+<text x='446.40' y='669.25' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110001</text>
+<text x='446.40' y='703.69' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110010</text>
+<text x='446.40' y='738.14' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110100</text>
+<text x='446.40' y='772.58' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111000</text>
+<text x='555.47' y='128.92' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>001111</text>
+<text x='555.47' y='174.12' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>010111</text>
+<text x='555.47' y='219.33' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011011</text>
+<text x='555.47' y='264.54' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011101</text>
+<text x='555.47' y='309.74' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011110</text>
+<text x='555.47' y='354.95' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>100111</text>
+<text x='555.47' y='400.16' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101011</text>
+<text x='555.47' y='445.37' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101101</text>
+<text x='555.47' y='490.57' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101110</text>
+<text x='555.47' y='535.78' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110011</text>
+<text x='555.47' y='580.99' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110101</text>
+<text x='555.47' y='626.20' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110110</text>
+<text x='555.47' y='671.40' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111001</text>
+<text x='555.47' y='716.61' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111010</text>
+<text x='555.47' y='761.82' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111100</text>
+<text x='664.54' y='187.04' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>011111</text>
+<text x='664.54' y='290.37' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>101111</text>
+<text x='664.54' y='393.70' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>110111</text>
+<text x='664.54' y='497.03' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111011</text>
+<text x='664.54' y='600.36' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111101</text>
+<text x='664.54' y='703.69' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111110</text>
+<text x='773.61' y='445.41' text-anchor='middle' style='font-size: 12.00px; font-family: "Times";' textLength='35.99px' lengthAdjust='spacingAndGlyphs'>111111</text>
 </g>
 </svg>
