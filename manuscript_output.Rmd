@@ -761,7 +761,7 @@ net_re %>%
   knitr::kable()
 ```
 
-Of the rewired, how many are constructive and how many are destructive?
+Of the rewired, how many are constructive and how many are disruptive?
 
 ```{r,network-rewiring-type-table,echo=F}
 # How many constructive and dispruptive rewiring events

@@ -1,0 +1,457 @@
+---
+title: "Nonlinear Transformation Analysis"
+author: "Karol Buda"
+date: "2023-09-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+## R-version 4.1.2
+
+# Load the required libraries
+library(tidyverse)
+## ✔ dplyr     1.1.3     ✔ readr     2.1.4
+## ✔ forcats   1.0.0     ✔ stringr   1.5.0
+## ✔ ggplot2   3.4.3     ✔ tibble    3.2.1
+## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+## ✔ purrr     1.0.2 
+library(splines) # 4.1.2
+library(mgcv) # 1.8.42
+library(knitr) # 1.43
+library(minpack.lm) # 1.2.3
+```
+
+### Data Loading
+***
+First I can iterate over all pred_df.csv files in the Output folder and extract the `observed effect`, `average effect`, and `WT effect` which can be used for the transformations, producing the merged file.
+
+
+```{r data_loading, echo=F, message=F, warning=F}
+
+# Define a function to merge CSV files
+merge_csv_files <- function(directory, pattern, columns_to_extract) {
+  # Get a list of CSV files matching the pattern in the specified directory
+  csv_files <- list.files(directory, recursive = TRUE, pattern = pattern, full.names = TRUE)
+  
+  # Read and extract specific columns from each CSV file
+  data_list <- map(csv_files, ~{
+    data <- read_csv(.x, show_col_types = FALSE)
+    file_name <- gsub("pred_df_", "", basename(.x))  # Remove specified pattern
+    file_name <- gsub("\\.csv$", "", file_name)  # Remove ".csv" extension
+    data$file_name <- file_name  # Add a new column with the modified file name
+    data <- data %>% select(file_name, {{ columns_to_extract }}) # This is now depricated and I should use all_of()?
+    return(data)
+  })
+  
+  # Combine the extracted data frames into a single tibble
+  merged_data <- bind_rows(data_list)
+  
+  return(merged_data)
+}
+
+# Specify the directory, pattern, and columns to extract
+directory <- "./../Output"
+pattern <- "pred_df*"
+columns_to_extract <- c("observed effect", "average effect", "WT effect")
+
+# Call the function to merge the CSV files
+result_tibble <- merge_csv_files(directory, pattern, columns_to_extract)
+
+# Trim the file_name to unique_id
+result_tibble <- result_tibble %>%
+  mutate(unique_id = str_split(file_name, "_")) %>%
+  mutate(unique_id = map_chr(unique_id, ~paste(tail(na.omit(.), 3), collapse = "_"))) %>%
+  select(-file_name)
+
+colnames(result_tibble) <- c("observed_effect", "average_effect", "wt_effect", "unique_id")
+
+# View the resulting tibble
+knitr::kable(head(result_tibble), format = "markdown")
+```
+
+- Observed effect: the log~10~ wt-normalized effect for a genotype
+- Average effect: the predicted effect for a genotype based on the use of a first-order linear model. Using first-order effects for non-linear transformations is common practice [Sailer & Harms, Otwinowski, Desai]
+- WT effect: the predicted effect for a genotype based on the use of the first-order biochemical model, *i.e.*, the SMEs as they appear in the wt-background.
+
+### Monotonic spline non-linear transform
+***
+
+#### Assessing degrees for splines
+
+I fit cubic splines with penalty towards monotonicity by varying degrees ranging from 1-5. Then, I used AIC to select the strongest model for each landscape, and log the number of degrees for the upcoming transform.
+
+
+```{r mono_spline, echo=F, message=F, warning=F}
+# Define a range of degrees for the spline transformation
+degrees <- seq(1, 5, by = 1)
+
+# Create a function to perform the monotonic spline analysis for each unique_id
+monotonic_spline_analysis <- function(data) {
+  results <- data.frame(Degree = numeric(0), AIC = numeric(0))
+  
+  for (degree in degrees) {
+    
+    spline_result <- gam(observed_effect ~ s(average_effect, bs = "cr", k = degree, m = 1), data = data)
+    
+    # Extract AIC from the result
+    AIC_value <- AIC(spline_result)
+    
+    results <- rbind(results, data.frame(Degree = degree, AIC = AIC_value))
+  }
+  
+  best_degree <- results$Degree[which.min(results$AIC)]
+  best_AIC <- results$AIC[which.min(results$AIC)]
+  
+  return(data.frame(Unique_ID = unique(data$unique_id), Best_Degree = best_degree, Best_AIC = best_AIC))
+}
+
+# Perform monotonic spline analysis for each unique_id using group_split
+results_list_monotonic <- result_tibble %>%
+  group_split(unique_id) %>%
+  map_df(~ monotonic_spline_analysis(.))
+
+# Print the results
+knitr::kable(results_list_monotonic)
+```
+
+#### Visual spline model evaluation
+
+I am then able to plot what the transformation function looks like (in blue) for each landscape with the x-axix representing additive effects, and y axis representing observed effects.
+
+
+```{r plotting_mono_transform, echo=F, message=F, warning=F}
+
+# Create a function to perform the cubic spline transformation and create a plot
+cubic_spline_plot <- function(data, best_degree, sample_id) {
+  # Modify the formula to include best_degree as a predictor
+  formula <- as.formula(paste("observed_effect ~ bs(average_effect, degree =", best_degree, ")"))
+  
+  # Perform the cubic spline transformation
+  spline_model <- gam(formula, data = data)
+  
+  # Predict the transformed values
+  predicted_values <- predict(spline_model, newdata = data)
+  
+  # Create a data frame for the plot
+  plot_data <- tibble(average_effect = data$average_effect, 
+                      observed_effect = data$observed_effect, 
+                      Predicted = predicted_values)
+  
+  # Create the plot using ggplot2
+  ggplot(plot_data, aes(x = average_effect, y = observed_effect)) +
+    geom_point() +                # Scatterplot of observed data
+    geom_line(aes(y = Predicted), color = "blue") +  # Line for transformed values
+    labs(title = paste("Cubic Spline Transformation of", sample_id, "(Degree =", best_degree, ")"),
+         x = "Additive Effect",
+         y = "Observed Effect") +
+    theme_classic() +  # Use classic theme
+    theme(
+      text = element_text(family = "Arial"),  # Change font to Arial
+      plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),  # Title customization
+      axis.title = element_text(size = 12),  # Axis label customization
+      axis.text = element_text(size = 10),  # Axis text size
+      legend.position = "none"  # Remove legend
+    )
+}
+
+# Iterate over each unique_id in results_list_monotonic and create a plot for each best_degree
+for (i in seq_along(results_list_monotonic$Unique_ID)) {
+  sample_id <- results_list_monotonic$Unique_ID[i]
+  sample_data <- result_tibble %>% filter(unique_id == sample_id)
+  best_degree <- results_list_monotonic$Best_Degree[i]
+  
+  # Create and display the plot
+  plot <- cubic_spline_plot(sample_data, best_degree, sample_id)
+  print(plot)
+}
+
+```
+
+#### Visualization of post-transformed data
+
+We can also inspect the transformed data by plotting scatterplots against the previous observed effects in order to gauge how the data will be transformed for each landscape.
+
+```{r visualizing_post_transform, echo=F}
+
+# Create a function to perform the cubic spline transformation and create a plot
+cubic_spline_post_transform_plot <- function(data, best_degree, sample_id) {
+  # Modify the formula to include best_degree as a predictor
+  formula <- as.formula(paste("observed_effect ~ bs(average_effect, degree =", best_degree, ")"))
+  
+  # Perform the cubic spline transformation
+  spline_model <- gam(formula, data = data)
+  
+  # Transform the observed_effect by setting it to the x-variable in 'newdata' 
+  newdata = tibble(average_effect = data$observed_effect)
+  
+  # Predict the transformed values
+  predicted_values <- predict(spline_model, newdata = newdata)
+  
+  # Create a data frame for the plot
+  plot_data <- tibble(average_effect = data$average_effect, 
+                      observed_effect = data$observed_effect, 
+                      Predicted = predicted_values)
+  
+  # Create the plot using ggplot2
+  ggplot(plot_data, aes(x = Predicted, y = observed_effect)) +
+    geom_point() +                # Scatterplot of observed data
+    labs(title = paste("Cubic Spline Transformation of", sample_id, "(Degree =", best_degree, ")"),
+         x = "Transformed Effect",
+         y = "Observed Effect") +
+    theme_classic() +  # Use classic theme
+    theme(
+      text = element_text(family = "Arial"),  # Change font to Arial
+      plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),  # Title customization
+      axis.title = element_text(size = 12),  # Axis label customization
+      axis.text = element_text(size = 10),  # Axis text size
+      legend.position = "none"  # Remove legend
+    )
+}
+
+# Iterate over each unique_id in results_list_monotonic and create a plot for each best_degree
+for (i in seq_along(results_list_monotonic$Unique_ID)) {
+  sample_id <- results_list_monotonic$Unique_ID[i]
+  sample_data <- result_tibble %>% filter(unique_id == sample_id)
+  best_degree <- results_list_monotonic$Best_Degree[i]
+  
+  # Create and display the plot
+  plot <- cubic_spline_post_transform_plot(sample_data, best_degree, sample_id)
+  print(plot)
+}
+
+```
+
+
+### Evaluation of four parameter transformations
+***
+
+The drawback of using monotonic splies (or even power transforms), as can be seen from the plots above, is the lack of bounding. Bounding is crucial to avoid greatly transforming phenotype values that lay outside of the bounds of the transform, which itself is constrained by the range of the predicted first-order effects.
+
+In other words, phenotypes with magnitudes that lay outside of the range of predicted values by the first-order model are at risk of being incorrectly transformed. Though this is somewhat true for a four-parameter model, the bounded upper- and lower- thresholds ensure that phenotypes that lay outside of the predicted range will be approximated more accurately, *i.e.*, the transformation will be lower in magnitude than other models.
+
+#### Four parameter function transform
+
+Here we attempt to transform all datasets using the four-paramter function, with fitting performed by non-linear least squares regression using nlsLM. The fits are compared to simple linear models using an AIC to determine whether the additional information stemming from the four-parameter transform is parsimonous, otherwise, no transform is applied.
+
+```{r four_param_trans_plot, echo = F}
+# Create a function to perform the cubic spline transformation and create a plot
+four_parameter_transform_plot <- function(data, sample_id) {
+ 
+  four_parameter_function <- function(upper, lower, mid, slope, x) {
+    return(upper - ( (upper - lower) ) / (1 + exp( (mid-x) * slope ) ) )
+  }
+  
+  # Fit a standard linear model
+  linear_model <- lm(observed_effect ~ average_effect, data = data)
+  
+  # Fit the sigmoid model
+  four_parameter_model <- try(nlsLM(observed_effect ~ four_parameter_function(upper, lower, mid, slope, average_effect),
+                                data = data,
+                                start = c(upper=max(data$average_effect), lower=min(data$average_effect), 
+                                          mid = data$average_effect[ceiling(length(data$average_effect)/2)], slope = 1),
+                                control = list(maxiter = 500)))
+  
+
+  if(class(four_parameter_model) != "try-error") {
+    if(AIC(four_parameter_model) < AIC(linear_model)){
+      # Predict the transformed values
+      predicted_values <- predict(four_parameter_model, newdata = data)
+      used_model = "Four-parameter"
+    } else {
+      predicted_values <- predict(linear_model, newdata = data)
+      used_model = "Linear"
+    }
+  } else {
+    #four_parameter_model has failed to fit or it is inferior to linear and we don't transform the data
+    predicted_values <- predict(linear_model, newdata = data)
+    used_model = "Linear"
+  }
+  
+  # Create a data frame for the plot
+  plot_data <- tibble(average_effect = data$average_effect, 
+                      observed_effect = data$observed_effect, 
+                      Predicted = predicted_values)
+  
+  # Create the plot
+  ggplot(plot_data, aes(x = average_effect, y = observed_effect)) +
+    geom_point() +                # Scatterplot of observed data
+    geom_line(aes(y = Predicted), color = "blue") +  # Line for transformed values
+    labs(title = paste(used_model, "Transformation of", sample_id),
+         x = "Additive Effect",
+         y = "Observed Effect") +
+    theme_classic() +  # Use classic theme
+    theme(
+      text = element_text(family = "Arial"),  # Change font to Arial
+      plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),  # Title customization
+      axis.title = element_text(size = 12),  # Axis label customization
+      axis.text = element_text(size = 10),  # Axis text size
+      legend.position = "none"  # Remove legend
+    )
+}
+
+# Iterate over each distinct unique_id in result_tibble and create a plot for each best_degree
+for (i in seq_along(unique(result_tibble$unique_id))) {
+  
+  sample_id <- unique(result_tibble$unique_id)[i]
+  sample_data <- result_tibble %>% filter(unique_id == sample_id)
+  
+  # Create and display the plot
+  plot <- four_parameter_transform_plot(sample_data, sample_id)
+  print(plot)
+}
+
+```
+
+Indeed, these fits appear much better visually, and we also avoid overfitting to datasets by simply utilizing the linear model. We can then use this analysis to transform and export these new data.
+
+#### Performing transformations and exporting data
+
+Upon performing transformations, it is also useful to see how the R^2^ value improves after transformations. Provided is the table of the pre- and post- transformation R^2^ values for a linear regression.
+
+### Data export
+***
+
+Here we need to re-import the data with the genotype column, and also get a list of columns that start with "p", *i.e.*, for AP we need to get p101, p166, p153, p322, and p328. We can scrub the p's and save this as a vector.
+
+The output csv files should have the following format (an example for AP):
+
+WT        |          |      |      |      |
+----------|----------|------|------|------|
+WT-seq    |          |      |      |      |
+Positions |          |      |      |      |
+p101      | p166     | p153 | p322 | p328 |
+Genotype  | Function |      |      |      |
+DRDEK     | 0        |      |      |      |
+
+and so on...
+
+```{r data_export, echo = F, warning=F}
+
+## Functions
+
+get_data <- function(file, pattern, columns) {
+  # Initialize empty vectors and data frames
+  data <- NULL
+  column_names <- c()
+
+  # Process the i-th CSV file
+  data <- read_csv(file, show_col_types = FALSE)
+  
+  # Get column names starting with "p"
+  column_names <- names(data)[grepl("^p", names(data))]
+  column_names <- str_remove_all(column_names, "p")
+  
+  # Extract specific columns (modify this line as needed)
+  lookup <- c(observed_effect = "observed effect", average_effect = "average effect")
+
+  data <- data %>%
+    select(all_of(columns)) %>%
+    rename(all_of(lookup))
+
+  return(list(data = data, p_columns = column_names))
+}
+
+export_four_param_transform <- function(data) {
+  
+  four_parameter_function <- function(upper, lower, mid, slope, x) {
+    return(upper - ( (upper - lower) ) / (1 + exp( (mid-x) * slope ) ) )
+  }
+  
+  # Fit a standard linear model
+  linear_model <- lm(observed_effect ~ average_effect, data = data)
+  
+  # Fit the sigmoid model
+  four_parameter_model <- try(nlsLM(observed_effect ~ four_parameter_function(upper, lower, mid, slope, average_effect),
+                                data = data,
+                                start = c(upper=max(data$average_effect), lower=min(data$average_effect), 
+                                          mid = data$average_effect[ceiling(length(data$average_effect)/2)], slope = 1),
+                                control = list(maxiter = 500)))
+  
+  newdata = tibble(average_effect = data$observed_effect)
+
+  if(class(four_parameter_model) != "try-error") {
+    if(AIC(four_parameter_model) < AIC(linear_model)){
+      # Predict the transformed values and force any values above and below bounds to the bound
+      predicted_values <- predict(four_parameter_model, newdata = newdata)
+    } else {
+      predicted_values <- data$observed_effect
+    }
+  } else {
+    #four_parameter_model has failed to fit or it is inferior to linear and we don't transform the data
+    predicted_values <- data$observed_effect
+  }
+  
+  # Transform the predicted_values such that WT is equal to 0 (normalization)
+  predicted_values <- predicted_values - predicted_values[1] # When WT is positive, it will shift all points down, and vice versa
+  
+  # Create a data frame for the plot
+  compare_data <- tibble(genotype = data$genotype, 
+                      Predicted = predicted_values)
+  
+  # Export dataset
+  return(compare_data)
+}
+
+# Function to export CSV with specified format. I realize this is terrible, sorry. Unfortunately the input I use for the epistasis model
+# is not very flexible
+write_custom_csv <- function(transformed_data, extracted_data, file_path) {
+  # Change names of transformed_data to fit input template
+  names(transformed_data) <- c("Genotype", "Function")
+  
+  # Know how many commas to add
+  commas = length(extracted_data$p_columns)
+  
+  # Open the file for writing
+  file_conn <- file(file_path, "w")
+  
+  # Write Line 1
+  cat(paste(c("WT", rep(",", commas - 1), "\n"), collapse = ""), file = file_conn)
+  
+  # Write Line 2
+  cat(paste(c(transformed_data$Genotype[1], rep(",", commas - 1), "\n"), collapse = ""), file = file_conn)
+  
+  # Write Line 3
+  cat(paste(c("Positions", rep(",", commas - 1), "\n"), collapse = ""), file = file_conn)
+  
+  # Write Line 4 with variable-length vector
+  cat(paste(extracted_data$p_columns, collapse = ","), "\n", file = file_conn)
+  
+  # Write Line 5 with "Genotype" and "Function"
+  cat(paste(c("Genotype,Function", rep(",", commas - 2), "\n"), collapse = ""), file = file_conn)
+  
+  # Loop to add each entry
+  for(i in 1:dim(transformed_data)[1]) {
+    cat(paste(c(as.character(transformed_data[i,1]), ",", as.numeric(transformed_data[i,2]), rep(",", commas - 3), "\n"), collapse = ""), file = file_conn)
+  }
+  
+  # Close the file connection
+  close(file_conn)
+}
+
+transform_run <- function(directory, pattern, columns_to_extract) {
+
+  for(i in 1:length(list.files(path = directory, pattern = pattern, full.names = TRUE, recursive = TRUE))) {
+  
+    file <- list.files(path = directory, pattern = pattern, full.names = TRUE, recursive = TRUE)[i]
+    
+    extracted_data <- get_data(file, pattern, columns_to_extract)
+    transformed_data <- export_four_param_transform(extracted_data$data)
+    
+    write_custom_csv(transformed_data, extracted_data, paste(c("trans_Input/", paste(tail(str_split(file, "_")[[1]], 3), collapse = "_") ), collapse = ""))
+  
+  }
+
+
+}
+
+## Run 
+
+directory <- "./../Output"
+pattern <- "pred_df*"
+columns_to_extract <- c("genotype", "observed effect", "average effect")
+
+transform_run(directory, pattern, columns_to_extract)
+
+```
+
+After the export is done, the data can be re-analyzed using the other scripts in this directory.
