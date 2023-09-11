@@ -1,10 +1,17 @@
+## R-version 4.1.2
+
 ### Library ###
 
 library(tidyverse)
-library(igraph) ## Network library
-library(gtools) ## Permutation library
-library(e1071) ## Hamming distance lib
-library(svglite) ## SVG file export
+## ✔ dplyr     1.1.3     ✔ readr     2.1.4
+## ✔ forcats   1.0.0     ✔ stringr   1.5.0
+## ✔ ggplot2   3.4.3     ✔ tibble    3.2.1
+## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+## ✔ purrr     1.0.2  
+library(igraph) ## Network library // 1.2.9
+library(gtools) ## Permutation library // 3.9.4
+library(e1071) ## Hamming distance lib // 1.7.13
+library(svglite) ## SVG file export // 2.1.1
 
 ### Update ###
 # If updater TRUE, it will run normally
@@ -51,7 +58,7 @@ data_loading = function() {
     simplex_chart = rbind(simplex_chart, c(as.numeric(code), chr))
   }
   
-  simplex_chart = unique(simplex_chart) ## Filter out repeats
+  simplex_chart = unique(simplex_chart) ## dplyr::filter out repeats
   
   codes = cbind(codes, data[,2])
   colnames(codes) = c(paste("p", d[3,][!is.na(d[3,])], sep = ""), "effect")
@@ -386,9 +393,9 @@ blanket_analysis = function() {
   
   for(i in 1:length(unique(new_codes$positions))) {
     wt_res = c(wt_res, sum(((new_codes %>%
-                               filter(positions == unique(new_codes$positions)[i]) %>%
-                               filter(mut == 1) %>%
-                               pull(effects)) - (new_codes %>% filter(positions == unique(new_codes$positions)[i]) %>% pull(effects)))^2))
+                               dplyr::filter(positions == unique(new_codes$positions)[i]) %>%
+                               dplyr::filter(mut == 1) %>%
+                               pull(effects)) - (new_codes %>% dplyr::filter(positions == unique(new_codes$positions)[i]) %>% pull(effects)))^2))
   }
   
   all_stats = bind_cols(all_stats, wt_res = wt_res)
@@ -417,7 +424,7 @@ blanket_analysis = function() {
     mutate(effect = log(magnitude, log_base)*c(1,-1)[as.numeric(negative) + 1],
            magnitude = magnitude > 1.5,
            sign = as.numeric(sign < 0)) %>%
-    filter(magnitude == T | sign == T) %>%
+    dplyr::filter(magnitude == T | sign == T) %>%
     dplyr::select(-c(magnitude, negative))
   
   write.csv(pymol_csv, "pymol_csv.csv", row.names = F)
@@ -428,13 +435,13 @@ blanket_analysis = function() {
   
   for(i in 1:length(unique(new_codes$positions))) {
     if(!dim(new_codes %>%
-            filter(positions == unique(new_codes$positions)[i]) %>%
-            filter(mut == 1))[1] > 0) {
-      test = c(test, rep(NA, dim(new_codes %>% filter(positions == unique(new_codes$positions)[i]))[1]))
+            dplyr::filter(positions == unique(new_codes$positions)[i]) %>%
+            dplyr::filter(mut == 1))[1] > 0) {
+      test = c(test, rep(NA, dim(new_codes %>% dplyr::filter(positions == unique(new_codes$positions)[i]))[1]))
     } else {
-      test = c(test, ((new_codes %>% filter(positions == unique(new_codes$positions)[i]) %>% pull(effects)) - new_codes %>%
-                        filter(positions == unique(new_codes$positions)[i]) %>%
-                        filter(mut == 1) %>%
+      test = c(test, ((new_codes %>% dplyr::filter(positions == unique(new_codes$positions)[i]) %>% pull(effects)) - new_codes %>%
+                        dplyr::filter(positions == unique(new_codes$positions)[i]) %>%
+                        dplyr::filter(mut == 1) %>%
                         pull(effects)))
     }
   }
@@ -648,10 +655,10 @@ network_analysis = function(eff = "observed") {
     
     ratio_codes = codes
     
-    for(i in 1:dim(filter(ratio_codes, muts > 2))[1]) {
+    for(i in 1:dim(dplyr::filter(ratio_codes, muts > 2))[1]) {
       
-      node = filter(ratio_codes, muts > 2)$id[i]
-      curr_mut = filter(ratio_codes, muts > 2)$muts[i]
+      node = dplyr::filter(ratio_codes, muts > 2)$id[i]
+      curr_mut = dplyr::filter(ratio_codes, muts > 2)$muts[i]
       
       prev = c()
       nodes = c()
@@ -659,13 +666,13 @@ network_analysis = function(eff = "observed") {
       for(j in 1:(curr_mut-2)) {
         if(j > 1) {
           for(k in 1:length(nodes)) {
-            prev = c(prev, filter(links, to == nodes[k]) %>% pull(from))
-            new_prev = c(new_prev, filter(links, to == nodes[k]) %>% pull(from))
+            prev = c(prev, dplyr::filter(links, to == nodes[k]) %>% pull(from))
+            new_prev = c(new_prev, dplyr::filter(links, to == nodes[k]) %>% pull(from))
           }
           nodes = new_prev
           new_prev = c()
         } else {
-          prev = c(prev, filter(links, to == node) %>% pull(from))
+          prev = c(prev, dplyr::filter(links, to == node) %>% pull(from))
           nodes = prev
         }
       }
@@ -855,10 +862,10 @@ feed_forward = function() {
   #####################################
   
   ratio_codes_ff = ratio_codes
-  ratio_codes_ff[ratio_codes_ff$muts == 1,]$effect = log_base^(pred_df %>% filter(mutations == 1) %>% pull(`observed effect`))
+  ratio_codes_ff[ratio_codes_ff$muts == 1,]$effect = log_base^(pred_df %>% dplyr::filter(mutations == 1) %>% pull(`observed effect`))
   
   temp_plot_2 = ratio_codes_ff %>%
-    filter(muts > 0) %>%
+    dplyr::filter(muts > 0) %>%
     mutate(muts = paste("Step ", muts, sep = ""), 
            effect = log(effect, log_base), 
            id = factor(id, rev(unique(id)))) %>%
@@ -907,7 +914,7 @@ feed_forward = function() {
     all = c(0, wt_effects)
     
     trunc_m = lm(paste("effect ~ (",vars ,")**", k, sep=""), ff_codes)
-    coefs = c(coefs, ratio_codes %>% filter(muts == k) %>% map_df(rev) %>% mutate(effect = log(effect, log_base)) %>% pull(effect))
+    coefs = c(coefs, ratio_codes %>% dplyr::filter(muts == k) %>% map_df(rev) %>% mutate(effect = log(effect, log_base)) %>% pull(effect))
     all = c(all, coefs)
     
     trunc_m$coefficients = all
@@ -1082,7 +1089,7 @@ higher_order_box = function() {
   final_work$mutations = muts
   
   first_order = final_work %>%
-    filter(mutations == 1) %>%
+    dplyr::filter(mutations == 1) %>%
     mutate(pos = factor(pos, levels = unique(pos)),
            mutations = paste("Order", mutations)) %>%
     ggplot(aes(x = pos, y = avg, label = genotype)) +
@@ -1104,7 +1111,7 @@ higher_order_box = function() {
   ggsave("first_order_box_plot.svg", plot = first_order, width = 180, height = 247/1.5, units = "mm")
   
   higher_order = final_work %>%
-    filter(mutations > 1) %>%
+    dplyr::filter(mutations > 1) %>%
     mutate(pos = factor(pos, levels = unique(pos)),
            mutations = paste("Order", mutations)) %>%
     ggplot(aes(x = pos, y = avg, label = genotype)) +
@@ -1187,7 +1194,7 @@ for(cur_input in 1:length(inputs)) {
   
   for(i in 1:length(starting_points)) {
     jumps = obs_links %>% 
-      filter(from == starting_points[i]) %>%
+      dplyr::filter(from == starting_points[i]) %>%
       pull(magnitude)
     
     transition_df = rbind(transition_df, tibble(mean = mean(jumps), max = max(jumps)))
