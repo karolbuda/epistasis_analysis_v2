@@ -10,7 +10,7 @@ library(svglite) ## SVG file export
 # If updater TRUE, it will run normally
 # If updater FALSE, it will only find files for which folders don't exist
 
-updater = T
+updater = F
 
 ### Inputs ###
 
@@ -341,7 +341,7 @@ epistasis_analysis = function() {
   pred_df$mutations = as.factor(mutations)
   
   pred_df = pred_df %>% add_column(numbers = pred_df %>% 
-                                     select(unlist(strsplit(vars, "+", fixed=TRUE))) %>% 
+                                     dplyr::select(unlist(strsplit(vars, "+", fixed=TRUE))) %>% 
                                      unite("numbers", 1:dim(.)[2], sep = "") %>% 
                                      mutate(numbers = str_replace_all(numbers, "-1", "0")) %>% 
                                      pull(numbers), .before = "genotype")
@@ -418,7 +418,7 @@ blanket_analysis = function() {
            magnitude = magnitude > 1.5,
            sign = as.numeric(sign < 0)) %>%
     filter(magnitude == T | sign == T) %>%
-    select(-c(magnitude, negative))
+    dplyr::select(-c(magnitude, negative))
   
   write.csv(pymol_csv, "pymol_csv.csv", row.names = F)
   
@@ -881,12 +881,12 @@ feed_forward = function() {
   write.csv(ratio_export, "ratio_export.csv", row.names = F)
   
   new_codes %>%
-    select(-c(effects)) %>%
+    dplyr::select(-c(effects)) %>%
     bind_cols(effects = test, enzyme = enzyme_name, type = measure_type, cond = cond) %>%
     write_csv(., paste(c(str_remove(file, ".csv"), "_wt_rel.csv"), collapse = ""), col_names = F)
   
   new_codes %>%
-    select(-c(effects)) %>%
+    dplyr::select(-c(effects)) %>%
     bind_cols(effects = new_codes$effects, enzyme = enzyme_name, type = measure_type, cond = cond) %>%
     write_csv(., paste(c(str_remove(file, ".csv"), "_2d_box.csv"), collapse = ""), col_names = F)
   
@@ -894,7 +894,7 @@ feed_forward = function() {
   
   vars = paste(colnames(codes)[1:length(colnames(codes))-1], collapse="+")
   
-  ff_codes = newer_codes %>% select(-c(avg, cv))
+  ff_codes = newer_codes %>% dplyr::select(-c(avg, cv))
   ff_codes[ff_codes == -1] = 0
   ff_codes$effect = newer_codes$avg
   
@@ -984,7 +984,7 @@ higher_order_box = function() {
         curr_work = curr_work %>% 
           group_by_at(which(1:places %notin% combos[combo])) %>%
           # Remove chosen positions to allow for summarizing with the subtract function 
-          select(-c(combos[combo])) %>%
+          dplyr::select(-c(combos[combo])) %>%
           summarise(avg = subtract(avg))
         # Artifically add in columns with Xs to account for where the positions were removed
         curr_work = add_column(curr_work, place_holder = rep("x", dim(curr_work)[1]), .before = combos[combo], .name_repair = "minimal")
@@ -1011,12 +1011,12 @@ higher_order_box = function() {
             dummy_work = dummy_work[which(str_sub(dummy_work$genotype, this[i, j], this[i, j]) == "x"),]
           }
         }
-        dummy_work = dummy_work %>% separate(genotype, letters[1:(places+1)], "") %>% select(-c(1))
+        dummy_work = dummy_work %>% separate(genotype, letters[1:(places+1)], "") %>% dplyr::select(-c(1))
         colnames(dummy_work) = c(position_names, "avg")
         
         for(del in 1:length(this[i,])) {
           that = this[i,][order(this[i,], decreasing = T)]
-          dummy_work = dummy_work %>% select(-c(that[del]))
+          dummy_work = dummy_work %>% dplyr::select(-c(that[del]))
         }
         
         dummy_work[cbind(dummy_work[1:length(dummy_work)-1] == "0", avg = FALSE)] <- "-1"
@@ -1031,7 +1031,7 @@ higher_order_box = function() {
             # Group by the rest of position so we can summarize them 
             group_by_at(which(1:(places - counter + 1) %notin% combos[combo])) %>%
             # Remove chosen positions to allow for summarizing with the subtract function 
-            select(-c(combos[combo])) %>%
+            dplyr::select(-c(combos[combo])) %>%
             summarise(avg = subtract(avg))
           # Artifically add in columns with Xs to account for where the positions were removed
           
