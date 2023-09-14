@@ -298,6 +298,7 @@ d1_plot = d1 %>%
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(1/1.5), lty = 2, lwd = 0.2) +
   theme_classic() +
+  xlim(-6, 6) +
   labs(x = expression(Delta*italic("F")), 
        y = "Genotype Count") +
   theme(axis.line = element_line(linewidth = 0.2, color = "black"), axis.ticks = element_line(linewidth = 0.2, color = "black"), text = element_text(size = 9), axis.text = element_text(size = 8, color = "black"), legend.position = "none")
@@ -339,6 +340,7 @@ idio_d_order_1 = idio_d %>%
   geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(10), lty = 2, lwd = 0.2) +
+  xlim(0, 4) +
   labs(x = expression("log"[10]*" 2SD"), 
        y = "Position Count") +
   theme_classic() +
@@ -619,11 +621,13 @@ Histogram to show heterogenity at Orders 2, 3, and 4 with the log10 1.5-fold sig
 idio_d_plot_2 = idio_d %>%
   filter(mutations == "Order 2") %>%
   ggplot(aes(x = idiosync)) +
-  geom_histogram(binwidth = 0.08, fill = "#edae49", color = "black", lwd = 0.1) +
+  geom_histogram(binwidth = 0.15, fill = "#edae49", color = "black", lwd = 0.1) +
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(10), lty = 2, lwd = 0.2) +
+  xlim(0,7)+
+  ylim(0,100)+
   labs(x = expression("log"[10]*" 2SD"), 
        y = "Combination Count") +
   theme_classic() +
@@ -640,11 +644,13 @@ idio_d_plot_2
 idio_d_plot_3 = idio_d %>%
   filter(mutations == "Order 3") %>%
   ggplot(aes(x = idiosync)) +
-  geom_histogram(binwidth = 0.08, fill = "#edae49", color = "black", lwd = 0.1) +
+  geom_histogram(binwidth = 0.15, fill = "#edae49", color = "black", lwd = 0.1) +
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(10), lty = 2, lwd = 0.2) +
+  xlim(0,7)+
+  ylim(0,100)+
   labs(x = expression("log"[10]*" 2SD"), 
        y = "Combination Count") +
   theme_classic() +
@@ -661,11 +667,13 @@ idio_d_plot_3
 idio_d_plot_4 = idio_d %>%
   filter(mutations == "Order 4") %>%
   ggplot(aes(x = idiosync)) +
-  geom_histogram(binwidth = 0.08, fill = "#edae49", color = "black", lwd = 0.1) +
+  geom_histogram(binwidth = 0.15, fill = "#edae49", color = "black", lwd = 0.1) +
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(10), lty = 2, lwd = 0.2) +
+  xlim(0,7)+
+  ylim(0,100)+
   labs(x = expression("log"[10]*" 2SD"), 
        y = "Combination Count") +
   theme_classic() +
@@ -770,20 +778,21 @@ pie_order_4
 devs_df_wt_2 = devs_df_wt %>%
   filter(muts == 2) %>%
   ggplot(aes(x = devs)) +
-  geom_histogram(binwidth=0.08, color = "black", lwd = 0.1, fill = "#edae49") +
+  geom_histogram(binwidth=0.12, color = "black", lwd = 0.1, fill = "#edae49") +
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(10), lty = 2, lwd = 0.2) +
   theme_classic() +
-  #scale_x_continuous(limits = c(0, 3)) +
+  xlim(0, 3)+
+  ylim(0,125)+
   labs(x = expression("Deviation from Combinatorial Mean (log"[10]*" "*epsilon*")"),
        y = "Combination Count") +
   theme(axis.line = element_line(linewidth = 0.2, color = "black"), axis.ticks = element_line(linewidth = 0.2, color = "black"), text = element_text(size = 9), axis.text = element_text(size = 8, color = "black"), legend.position = "none")
 
 devs_df_wt_2
 
-#ggsave("fig_sup_4B_1.svg", devs_df_wt_2, width = 180/3, height = 247/4, dpi = 300, units = "mm")
+#ggsave("fig_4B_1.svg", devs_df_wt_2, width = 180/3, height = 247/4, dpi = 300, units = "mm")
 ```
 
 ##### Histogram of wt/mean dev - three-way EEs
@@ -792,12 +801,13 @@ devs_df_wt_2
 devs_df_wt_3 = devs_df_wt %>%
   filter(muts == 3) %>%
   ggplot(aes(x = devs)) +
-  geom_histogram(binwidth=0.08, color = "black", lwd = 0.1, fill = "#edae49") +
+  geom_histogram(binwidth=0.12, color = "black", lwd = 0.1, fill = "#edae49") +
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(10), lty = 2, lwd = 0.2) +
-  #scale_x_continuous(limits = c(0, 3)) +
+  xlim(0, 3)+
+  ylim(0,125)+
   theme_classic() +
   labs(x = expression("Deviation from Combinatorial Mean (log"[10]*" "*epsilon*")"),
        y = "Combination Count") +
@@ -805,7 +815,7 @@ devs_df_wt_3 = devs_df_wt %>%
 
 devs_df_wt_3
 
-#ggsave("fig_sup_4B_2.svg", devs_df_wt_3, width = 180/3, height = 247/4, dpi = 300, units = "mm")
+#ggsave("fig_4B_2.svg", devs_df_wt_3, width = 180/3, height = 247/4, dpi = 300, units = "mm")
 ```
 
 ##### Histogram of wt/mean dev - four-way EEs
@@ -814,20 +824,21 @@ devs_df_wt_3
 devs_df_wt_4 = devs_df_wt %>%
   filter(muts == 4) %>%
   ggplot(aes(x = devs)) +
-  geom_histogram(binwidth=0.08, color = "black", lwd = 0.1, fill = "#edae49") +
+  geom_histogram(binwidth=0.12, color = "black", lwd = 0.1, fill = "#edae49") +
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(10), lty = 2, lwd = 0.2) +
   theme_classic() +
-  #scale_x_continuous(limits = c(0, 3)) + # Same scale used later
+  xlim(0, 3)+
+  ylim(0,125)+
   labs(x = expression("Deviation from Combinatorial Mean (log"[10]*" "*epsilon*")"),
        y = "Combination Count") +
   theme(axis.line = element_line(linewidth = 0.2, color = "black"), axis.ticks = element_line(linewidth = 0.2, color = "black"), text = element_text(size = 9), axis.text = element_text(size = 8, color = "black"), legend.position = "none")
 
 devs_df_wt_4
 
-#ggsave("fig_sup_4B_3.svg", devs_df_wt_4, width = 180/3, height = 247/4, dpi = 300, units = "mm")
+#ggsave("fig_4B_3.svg", devs_df_wt_4, width = 180/3, height = 247/4, dpi = 300, units = "mm")
 ```
 
 Like the SMEs, we checked whether there is a sign deviation between the wt EE and mean EE at each order of interaction. For pairwise we saw `r paste0(length(which(devs_df_wt %>% filter(muts == 2) %>% pull(sign_devs))), "/", length(devs_df_wt %>% filter(muts == 2) %>% pull(sign_devs)))` (`r paste0(round(sum(devs_df_wt %>% filter(muts == 2) %>% pull(sign_devs)) / length(devs_df_wt %>% filter(muts == 2) %>% pull(sign_devs)) * 100, 2), "%") `). For three-way we saw `r paste0(length(which(devs_df_wt %>% filter(muts == 3) %>% pull(sign_devs))), "/", length(devs_df_wt %>% filter(muts == 3) %>% pull(sign_devs)))` (`r paste0(round(sum(devs_df_wt %>% filter(muts == 3) %>% pull(sign_devs)) / length(devs_df_wt %>% filter(muts == 3) %>% pull(sign_devs)) * 100, 2), "%")`). For four-way we saw `r paste0(length(which(devs_df_wt %>% filter(muts == 4) %>% pull(sign_devs))), "/", length(devs_df_wt %>% filter(muts == 4) %>% pull(sign_devs)))` (`r paste0(round(sum(devs_df_wt %>% filter(muts == 4) %>% pull(sign_devs)) / length(devs_df_wt %>% filter(muts == 4) %>% pull(sign_devs)) * 100, 2), "%")`).
@@ -879,10 +890,10 @@ all_mae_long = all_mae %>%
 mae_ggplot = all_mae_long %>%
   ggplot(aes(x = Step, y = AE, color = Model)) +
   geom_point(size = 1, position=position_jitterdodge(jitter.width = 0.1)) +
-  stat_summary(data = all_mae_long %>% filter(Model == "Last MAE"), fun=mean, colour="black", geom="crossbar", width=0.2, position = position_nudge(x = -0.19, y = 0), size = 0.3) +
-  stat_summary(data = all_mae_long %>% filter(Model == "Linear Last MAE"), fun=mean, colour="black", geom="crossbar", width=0.2, position = position_nudge(x = 0.19, y = 0),size = 0.3) +
-   stat_summary(data = all_mae_long %>% filter(Model == "Last MAE"), fun=median, colour="darkred", geom="crossbar", width=0.2, position = position_nudge(x = -0.19, y = 0), size = 0.3) +
-  stat_summary(data = all_mae_long %>% filter(Model == "Linear Last MAE"), fun=median, colour="darkred", geom="crossbar", width=0.2, position = position_nudge(x = 0.19, y = 0),size = 0.3) +
+  stat_summary(data = all_mae_long %>% filter(Model == "Last MAE"), fun=mean, colour="black", geom="crossbar", width=0.2, position = position_nudge(x = -0.19, y = 0), linewidth = 0.3) +
+  stat_summary(data = all_mae_long %>% filter(Model == "Linear Last MAE"), fun=mean, colour="black", geom="crossbar", width=0.2, position = position_nudge(x = 0.19, y = 0),linewidth = 0.3) +
+   stat_summary(data = all_mae_long %>% filter(Model == "Last MAE"), fun=median, colour="darkred", geom="crossbar", width=0.2, position = position_nudge(x = -0.19, y = 0), linewidth = 0.3) +
+  stat_summary(data = all_mae_long %>% filter(Model == "Linear Last MAE"), fun=median, colour="darkred", geom="crossbar", width=0.2, position = position_nudge(x = 0.19, y = 0),linewidth = 0.3) +
   geom_hline(yintercept = log10(1.5), lty = 2, linewidth = 0.2) +
   scale_color_manual(values = c("#edae49", "#4988ed")) +
   labs(x = "Order of the Model", 
@@ -892,7 +903,7 @@ mae_ggplot = all_mae_long %>%
   coord_cartesian(ylim=c(0, 6)) # Zoom without affecting means and medians
 
 mae_ggplot
-#ggsave("fig_3B.svg", mae_ggplot, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+ggsave("fig_3B.svg", mae_ggplot, width = 180/2, height = 247/4, dpi = 300, units = "mm")
 ```
 
 This plot omits some data from being viewed, however plotted means and medians are accurate. The figure is edited outside of the code for aesthetics. 
@@ -988,7 +999,7 @@ supp_4_plot = plotting_d_supp_4 %>%
 
 supp_4_plot
 
-#ggsave("fig_3D.svg", supp_4_plot, width = 180, height = 247/3, dpi = 300, units = "mm")
+ggsave("fig_3D.svg", supp_4_plot, width = 180, height = 247/3, dpi = 300, units = "mm")
 ```
 
 Interestingly, for the trajectories that were transformed by the non-linear transform (both DHFR_ki trajectories, NfsA trajectories, OXA trajectories, PTE, and TEM) the previous finding of the lower model often being better at prediction is alleviated. Hence, it appears it was mostly non-specific epistasis that was causing the large error in prediction of incorporating apparent idiosyncratic epistasis into the model.
