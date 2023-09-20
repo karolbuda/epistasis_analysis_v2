@@ -1,0 +1,389 @@
+---
+title: "Sign Heterogeneity Proportions"
+author: "Karol Buda"
+date: "2023-08-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+## ✔ dplyr     1.1.3     ✔ readr     2.1.4
+## ✔ forcats   1.0.0     ✔ stringr   1.5.0
+## ✔ ggplot2   3.4.3     ✔ tibble    3.2.1
+## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+## ✔ purrr     1.0.2 
+library(readxl) # 1.4.3
+```
+
+### Analysis of proportions within sign heterogeneity
+
+Review no. 1 has requested that we explore the proportion of signs within each category of sign heterogeneity. For example, for pos-neg, how many mutations are actually within both regions?
+
+This can be explored by quickly repeating categorization of each position, and then looking at the spread within that:
+
+```{r sign_spread, echo = F}
+
+supp2 = read_xlsx("Supplementary Data 2.xlsx")
+
+supp2_spread = supp2 %>%
+  mutate(category=cut("SME", breaks=c(-Inf, log10(1/1.5), log10(1.5), Inf), labels=c("neg","neutral","pos"))) %>%
+  group_by(`Unique ID`, category) %>%
+  count(category) %>%
+  pivot_wider(names_from = category, values_from = n)
+
+type = c()
+for(i in 1:dim(supp2_spread)[1]){
+  if(!is.na(supp2_spread[i,]$neg) & !is.na(supp2_spread[i,]$pos)){
+    type = c(type, "negpos")
+  }
+  if(!is.na(supp2_spread[i,]$neg) & !is.na(supp2_spread[i,]$neutral) & is.na(supp2_spread[i,]$pos)){
+    type = c(type, "negneut")
+  }
+  if(is.na(supp2_spread[i,]$neg) & !is.na(supp2_spread[i,]$neutral) & !is.na(supp2_spread[i,]$pos)){
+    type = c(type, "posneut")
+  }
+  if(is.na(supp2_spread[i,]$neg) & !is.na(supp2_spread[i,]$neutral) & is.na(supp2_spread[i,]$pos)){
+    type = c(type, "neut")
+  }
+  if(!is.na(supp2_spread[i,]$neg) & is.na(supp2_spread[i,]$neutral) & is.na(supp2_spread[i,]$pos)){
+    type = c(type, "neg")
+  }
+  if(is.na(supp2_spread[i,]$neg) & is.na(supp2_spread[i,]$neutral) & !is.na(supp2_spread[i,]$pos)){
+    type = c(type, "pos")
+  }
+}
+
+supp2_spread$type = type
+
+supp2_spread
+
+```
+
+Now that categories and their counts are assigned, we can look at these proportions for each unique_ID
+
+```{r show_spread}
+my_order = unique(supp2_spread %>%
+  mutate(total = sum(neg, neutral, pos, na.rm=TRUE),
+         neg = 100*neg/total,
+         neutral = 100*neutral/total,
+         pos = 100*pos/total) %>%
+  arrange(desc(pos)) %>%
+  pull(`Unique ID`))
+
+supp2_spread[is.na(supp2_spread)] = 0
+
+supp2_plot_order_1 = supp2_spread %>%
+  mutate(total = sum(neg, neutral, pos, na.rm=TRUE),
+         Negative = 100*neg/total,
+         Neutral = 100*neutral/total,
+         Positive = 100*pos/total) %>%
+  mutate(Position = factor(`Unique ID`, levels = my_order)) %>%
+  pivot_longer(cols = c("Negative", "Neutral", "Positive"), names_to = "Category", values_to = "Proportion (%)") %>%
+  filter(type == "negpos") %>%
+  ggplot(aes(x = Position, y = `Proportion (%)`, fill = Category)) +
+  geom_bar(position="stack", stat="identity", width=1) +
+  scale_y_continuous(limits = c(0, 100), breaks = c(100/10*(0:10))) +
+  scale_fill_manual(values = c("#00bfc4", "#808080", "#f8766d")) +
+  theme_classic() +
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"), axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        legend.position = "none")
+
+supp2_plot_order_1
+
+#ggsave("fig_new_supp1A.svg", plot = supp2_plot_order_1, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+```
+
+I can also remove neutral and create a proportion of purely positive/negative distribution
+
+```{r show_spread_no_neutral}
+my_order = unique(supp2_spread %>%
+  mutate(total = sum(neg, pos, na.rm=TRUE),
+         neg = 100*neg/total,
+         pos = 100*pos/total) %>%
+  arrange(neg) %>%
+  pull(`Unique ID`))
+
+supp2_plot_order_1_noneut = supp2_spread %>%
+  mutate(total = sum(neg, pos, na.rm=TRUE),
+         Negative = 100*neg/total,
+         Positive = 100*pos/total) %>%
+  mutate(Position = factor(`Unique ID`, levels = my_order)) %>%
+  dplyr::select(-neutral) %>%
+  pivot_longer(cols = c("Negative", "Positive"), names_to = "Category", values_to = "Proportion (%)") %>%
+  filter(type == "negpos") %>%
+  ggplot(aes(x = Position, y = `Proportion (%)`, fill = Category)) +
+  geom_bar(position="stack", stat="identity", width=1) +
+  scale_y_continuous(limits = c(0, 100), breaks = c(100/10*(0:10))) +
+  scale_fill_manual(values = c("#00bfc4", "#f8766d")) +
+  theme_classic() +
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"), axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        legend.position = "none")
+
+supp2_plot_order_1_noneut
+
+#ggsave("fig_new_supp1B.svg", plot = supp2_plot_order_1_noneut, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+```
+
+It is also worth doing this for the epistatic effects in supp3
+
+```{r show_spread_ees}
+
+supp3 = read_xlsx("Supplementary Data 3.xlsx")
+
+supp3_spread = supp3 %>%
+  mutate(category=cut("Epistasis", breaks=c(-Inf, log10(1/1.5), log10(1.5), Inf), labels=c("neg","neutral","pos"))) %>%
+  group_by(`Unique ID`, Order, category) %>%
+  count(category) %>%
+  pivot_wider(names_from = category, values_from = n)
+
+type = c()
+for(i in 1:dim(supp3_spread)[1]){
+  if(!is.na(supp3_spread[i,]$neg) & !is.na(supp3_spread[i,]$pos)){
+    type = c(type, "negpos")
+  }
+  if(!is.na(supp3_spread[i,]$neg) & !is.na(supp3_spread[i,]$neutral) & is.na(supp3_spread[i,]$pos)){
+    type = c(type, "negneut")
+  }
+  if(is.na(supp3_spread[i,]$neg) & !is.na(supp3_spread[i,]$neutral) & !is.na(supp3_spread[i,]$pos)){
+    type = c(type, "posneut")
+  }
+  if(is.na(supp3_spread[i,]$neg) & !is.na(supp3_spread[i,]$neutral) & is.na(supp3_spread[i,]$pos)){
+    type = c(type, "neut")
+  }
+  if(!is.na(supp3_spread[i,]$neg) & is.na(supp3_spread[i,]$neutral) & is.na(supp3_spread[i,]$pos)){
+    type = c(type, "neg")
+  }
+  if(is.na(supp3_spread[i,]$neg) & is.na(supp3_spread[i,]$neutral) & !is.na(supp3_spread[i,]$pos)){
+    type = c(type, "pos")
+  }
+}
+
+supp3_spread$type = type
+
+```
+
+In order we can do neutral and neutral removed
+
+```{r spread_order_2}
+my_order = unique(supp3_spread %>%
+  filter(Order == 2) %>%
+  mutate(total = sum(neg, neutral, pos, na.rm=TRUE),
+         neg = 100*neg/total,
+         neutral = 100*neutral/total,
+         pos = 100*pos/total) %>%
+  arrange(desc(pos)) %>%
+  pull(`Unique ID`))
+
+supp3_spread[is.na(supp3_spread)] = 0
+
+supp2_plot_order_2 = supp3_spread %>%
+  filter(Order == 2) %>%
+  mutate(total = sum(neg, neutral, pos, na.rm=TRUE),
+         Negative = 100*neg/total,
+         Neutral = 100*neutral/total,
+         Positive = 100*pos/total) %>%
+  mutate(Combination = factor(`Unique ID`, levels = my_order)) %>%
+  pivot_longer(cols = c("Negative", "Neutral", "Positive"), names_to = "Category", values_to = "Proportion (%)") %>%
+  filter(type == "negpos") %>%
+  ggplot(aes(x = Combination, y = `Proportion (%)`, fill = Category)) +
+  geom_bar(position="stack", stat="identity", width=1) +
+  scale_y_continuous(limits = c(0, 100), breaks = c(100/10*(0:10))) +
+  scale_fill_manual(values = c("#00bfc4", "#808080", "#f8766d")) +
+  theme_classic() +
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"), axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        legend.position = "none")
+
+supp2_plot_order_2
+
+#ggsave("fig_new_supp2A.svg", plot = supp2_plot_order_2, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+```
+
+```{r spread_order_2_noneut}
+my_order = unique(supp3_spread %>%
+  filter(Order == 2) %>%
+  mutate(total = sum(neg, pos, na.rm=TRUE),
+         neg = 100*neg/total,
+         pos = 100*pos/total) %>%
+  arrange(neg) %>%
+  pull(`Unique ID`))
+
+supp2_plot_order_2_noneut = supp3_spread %>%
+  filter(Order == 2) %>%
+  mutate(total = sum(neg, pos, na.rm=TRUE),
+         Negative = 100*neg/total,
+         Positive = 100*pos/total) %>%
+  mutate(Combination = factor(`Unique ID`, levels = my_order)) %>%
+  dplyr::select(-neutral) %>%
+  pivot_longer(cols = c("Negative", "Positive"), names_to = "Category", values_to = "Proportion (%)") %>%
+  filter(type == "negpos") %>%
+  ggplot(aes(x = Combination, y = `Proportion (%)`, fill = Category)) +
+  geom_bar(position="stack", stat="identity", width=1) +
+  scale_y_continuous(limits = c(0, 100), breaks = c(100/10*(0:10))) +
+  scale_fill_manual(values = c("#00bfc4", "#f8766d")) +
+  theme_classic() +
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"), axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        legend.position = "none")
+
+supp2_plot_order_2_noneut
+
+#ggsave("fig_new_supp2B.svg", plot = supp2_plot_order_2_noneut, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+
+```
+
+For the 3rd Order
+
+```{r spread_order_3}
+my_order = unique(supp3_spread %>%
+  filter(Order == 3) %>%
+  mutate(total = sum(neg, neutral, pos, na.rm=TRUE),
+         neg = 100*neg/total,
+         neutral = 100*neutral/total,
+         pos = 100*pos/total) %>%
+  arrange(desc(pos)) %>%
+  pull(`Unique ID`))
+
+supp2_plot_order_3 = supp3_spread %>%
+  filter(Order == 3) %>%
+  mutate(total = sum(neg, neutral, pos, na.rm=TRUE),
+         Negative = 100*neg/total,
+         Neutral = 100*neutral/total,
+         Positive = 100*pos/total) %>%
+  mutate(Combination = factor(`Unique ID`, levels = my_order)) %>%
+  pivot_longer(cols = c("Negative", "Neutral", "Positive"), names_to = "Category", values_to = "Proportion (%)") %>%
+  filter(type == "negpos") %>%
+  ggplot(aes(x = Combination, y = `Proportion (%)`, fill = Category)) +
+  geom_bar(position="stack", stat="identity", width=1) +
+  scale_y_continuous(limits = c(0, 100), breaks = c(100/10*(0:10))) +
+  scale_fill_manual(values = c("#00bfc4", "#808080", "#f8766d")) +
+  theme_classic() +
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"), axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        legend.position = "none")
+
+supp2_plot_order_3
+
+#ggsave("fig_new_supp2C.svg", plot = supp2_plot_order_3, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+```
+
+```{r spread_order_3_noneut}
+my_order = unique(supp3_spread %>%
+  filter(Order == 3) %>%
+  mutate(total = sum(neg, pos, na.rm=TRUE),
+         neg = 100*neg/total,
+         pos = 100*pos/total) %>%
+  arrange(neg) %>%
+  pull(`Unique ID`))
+
+supp2_plot_order_3_noneut = supp3_spread %>%
+  filter(Order == 3) %>%
+  mutate(total = sum(neg, pos, na.rm=TRUE),
+         Negative = 100*neg/total,
+         Positive = 100*pos/total) %>%
+  mutate(Combination = factor(`Unique ID`, levels = my_order)) %>%
+  dplyr::select(-neutral) %>%
+  pivot_longer(cols = c("Negative", "Positive"), names_to = "Category", values_to = "Proportion (%)") %>%
+  filter(type == "negpos") %>%
+  ggplot(aes(x = Combination, y = `Proportion (%)`, fill = Category)) +
+  geom_bar(position="stack", stat="identity", width=1) +
+  scale_y_continuous(limits = c(0, 100), breaks = c(100/10*(0:10))) +
+  scale_fill_manual(values = c("#00bfc4", "#f8766d")) +
+  theme_classic() +
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"), axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        legend.position = "none")
+
+supp2_plot_order_3_noneut
+
+#ggsave("fig_new_supp2D.svg", plot = supp2_plot_order_3_noneut, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+
+```
+
+For the 4th order
+
+```{r spread_order_4}
+my_order = unique(supp3_spread %>%
+  filter(Order == 4) %>%
+  mutate(total = sum(neg, neutral, pos, na.rm=TRUE),
+         neg = 100*neg/total,
+         neutral = 100*neutral/total,
+         pos = 100*pos/total) %>%
+  arrange(desc(pos)) %>%
+  pull(`Unique ID`))
+
+
+supp2_plot_order_4 = supp3_spread %>%
+  filter(Order == 4) %>%
+  mutate(total = sum(neg, neutral, pos, na.rm=TRUE),
+         Negative = 100*neg/total,
+         Neutral = 100*neutral/total,
+         Positive = 100*pos/total) %>%
+  mutate(Combination = factor(`Unique ID`, levels = my_order)) %>%
+  pivot_longer(cols = c("Negative", "Neutral", "Positive"), names_to = "Category", values_to = "Proportion (%)") %>%
+  filter(type == "negpos") %>%
+  ggplot(aes(x = Combination, y = `Proportion (%)`, fill = Category)) +
+  geom_bar(position="stack", stat="identity", width=1) +
+  scale_y_continuous(limits = c(0, 100), breaks = c(100/10*(0:10))) +
+  scale_fill_manual(values = c("#00bfc4", "#808080", "#f8766d")) +
+  theme_classic() +
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"), axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        legend.position = "none")
+
+supp2_plot_order_4
+
+#ggsave("fig_new_supp2E.svg", plot = supp2_plot_order_4, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+
+```
+
+```{r spread_order_4_noneut}
+my_order = unique(supp3_spread %>%
+  filter(Order == 4) %>%
+  mutate(total = sum(neg, pos, na.rm=TRUE),
+         neg = 100*neg/total,
+         pos = 100*pos/total) %>%
+  arrange(neg) %>%
+  pull(`Unique ID`))
+
+supp2_plot_order_4_noneut = supp3_spread %>%
+  filter(Order == 4) %>%
+  mutate(total = sum(neg, pos, na.rm=TRUE),
+         Negative = 100*neg/total,
+         Positive = 100*pos/total) %>%
+  mutate(Combination = factor(`Unique ID`, levels = my_order)) %>%
+  dplyr::select(-neutral) %>%
+  pivot_longer(cols = c("Negative", "Positive"), names_to = "Category", values_to = "Proportion (%)") %>%
+  filter(type == "negpos") %>%
+  ggplot(aes(x = Combination, y = `Proportion (%)`, fill = Category)) +
+  geom_bar(position="stack", stat="identity", width=1) +
+  scale_y_continuous(limits = c(0, 100), breaks = c(100/10*(0:10))) +
+  scale_fill_manual(values = c("#00bfc4", "#f8766d")) +
+  theme_classic() +
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"), axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        legend.position = "none")
+
+supp2_plot_order_4_noneut
+
+#ggsave("fig_new_supp2F.svg", plot = supp2_plot_order_4_noneut, width = 180/2, height = 247/4, dpi = 300, units = "mm")
+```
