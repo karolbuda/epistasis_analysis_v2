@@ -27,9 +27,13 @@ tidyverse 2.0.0
 
 All scripts must be run by opening the R project file (epistasis_analysis_v2.Rproj).
 
+No other installation is required and scripts can be run directly from the repository.
+
 ### Script order
 
 First it is necessary to run Pre non-linear transformation scripts as the non-linear transformation depends on these outputs. Next, non-lin-trans.Rmd must be run to export the four-parameter transformsed data. Finally, non-lin_epistasis_model_bulk.R must be run to generate the all outputs for the analyses, followed by non-lin_statistical_epistasis_analysis_rev.Rmd and Supplementary File 2.Rmd.
+
+The total run time is approx. 1 hour.
 
 ---
 
