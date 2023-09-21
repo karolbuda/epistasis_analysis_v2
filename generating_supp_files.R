@@ -84,6 +84,6 @@ higher_df = higher_df %>%
   unite("partial_id", c(Enzyme, Measurement, Condition), remove = F) %>%
   dplyr::select(-c(Measurement, Condition))
 
-names(higher_df) = c("Genotype", "Epistasis", "Unique ID", "Combination", "Partial ID", "Enzyme")
+names(higher_df) = c("Genotype", "Epistasis", "Unique ID", "Combination", "Order", "Partial ID", "Enzyme")
 
 writexl::write_xlsx(higher_df, "Supplementary File 3.xlsx")

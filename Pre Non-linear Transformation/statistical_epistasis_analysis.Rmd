@@ -1,22 +1,29 @@
 ---
 title: "statistical_analysis_epistasis"
-output: html_document
+Pre Non-linear Transformation/Output: html_document
 ---
 
 ```{r, setup, include=FALSE}
+# R 4.1.2
+
 library(tidyverse)
-library(ggrepel)
-library(ggpubr)
+# ✔ dplyr     1.1.3     ✔ readr     2.1.4
+# ✔ forcats   1.0.0     ✔ stringr   1.5.0
+# ✔ ggplot2   3.4.3     ✔ tibble    3.2.1
+# ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+# ✔ purrr     1.0.2 
+library(ggrepel) # 0.9.3
+library(ggpubr) # 0.6.0
 ```
 
 ## Error-rate assessment
 
-Take all the input files, attach their unique_id, find the ones with replicates, then look at the median of 2*SD (~95% spread around measurement mean) for all measurements to decided on an approriate significance threshold
+Take all the Pre Non-linear Transformation/Input files, attach their unique_id, find the ones with replicates, then look at the median of 2*SD (~95% spread around measurement mean) for all measurements to decided on an approriate significance threshold
 
 ```{r}
-file_vector = str_remove(list.files(path = "Input", pattern="*.csv", recursive = T), ".csv")
+file_vector = str_remove(list.files(path = "Pre Non-linear Transformation/Input", pattern="*.csv", recursive = T), ".csv")
 
-error_set = lapply(paste0("Input/", list.files(path = "Input", pattern="*.csv", recursive = T)), read_csv, skip = 5, col_names = F, col_select = 1:2, show_col_types=F)
+error_set = lapply(paste0("Pre Non-linear Transformation/Input/", list.files(path = "Pre Non-linear Transformation/Input", pattern="*.csv", recursive = T)), read_csv, skip = 5, col_names = F, col_select = 1:2, show_col_types=F)
 
 for(i in 1:length(error_set)){
   error_set[[i]][,3] = file_vector[i]
@@ -53,10 +60,10 @@ error_rates %>%
 ```
 ## Fold-Change Data
 
-Here we look at the fold-change data used in the input files. This allows us to see positive and negative functional effects across the landscapes.
+Here we look at the fold-change data used in the Pre Non-linear Transformation/Input files. This allows us to see positive and negative functional effects across the landscapes.
 
 ```{r, message=F}
-fit_land = do.call("rbind", lapply(paste0("Output/", list.files(path = "Output", pattern="observed_values.csv", recursive = T)), read_csv, skip = 1, show_col_types=F, col_names = c("id", "effect", "muts", "junk1", "junk2", "enz")))
+fit_land = do.call("rbind", lapply(paste0("Pre Non-linear Transformation/Output/", list.files(path = "Pre Non-linear Transformation/Output", pattern="observed_values.csv", recursive = T)), read_csv, skip = 1, show_col_types=F, col_names = c("id", "effect", "muts", "junk1", "junk2", "enz")))
 
 ## Make fit_land have IDs by finding where muts are 0, i.e. start of new dataset, and multiplying
 ## Those values by the folder names to generate ID vector
@@ -76,7 +83,7 @@ for(i in 1:(length(fit_land_spots) - 1)) {
 
 ## This assumes folders are read in the order that they are listed
 
-fit_land_ids = rep(str_remove_all(list.files(path = "Output", pattern="observed_values.csv", recursive = T), "/observed_values.csv"), fit_land_counts)
+fit_land_ids = rep(str_remove_all(list.files(path = "Pre Non-linear Transformation/Output", pattern="observed_values.csv", recursive = T), "/observed_values.csv"), fit_land_counts)
 
 fit_land$unique_id = fit_land_ids
 
@@ -120,9 +127,9 @@ First we import the ratio datasets, which contains ratio values between predicte
 
 ```{r, message = F}
 
-all_ratios = lapply(paste0("Output/", list.files(path = "Output", pattern="ratio_export.csv", recursive = T)), read_csv, skip = 1, show_col_types=F, col_names = c("id", "effect", "muts", "cv", "colors"))
+all_ratios = lapply(paste0("Pre Non-linear Transformation/Output/", list.files(path = "Pre Non-linear Transformation/Output", pattern="ratio_export.csv", recursive = T)), read_csv, skip = 1, show_col_types=F, col_names = c("id", "effect", "muts", "cv", "colors"))
 
-all_ratios_id = str_remove_all(list.files(path = "Output", pattern="ratio_export.csv", recursive = T), "/ratio_export.csv")
+all_ratios_id = str_remove_all(list.files(path = "Pre Non-linear Transformation/Output", pattern="ratio_export.csv", recursive = T), "/ratio_export.csv")
 
 temp_col_length = length(all_ratios[[1]]) + 1
 
@@ -138,7 +145,7 @@ colnames(all_ratios) = c("id", "effect", "muts", "cv", "colors", "partial_id")
 
 ```
 
-Filtering ratio data to only include genotypes with 2+ mutations. Outputting length of vector.
+Filtering ratio data to only include genotypes with 2+ mutations. Pre Non-linear Transformation/Outputting length of vector.
 
 ```{r}
 all_ratios = all_ratios %>% filter(muts > 1)
@@ -259,7 +266,7 @@ Here we import the functional contribution of single positions (not combinations
 ```{r,message=F}
 ## Reads all csvs in collated folder and combines them
 
-d = do.call("rbind", lapply(paste0("Output/", list.files(path = "Output", pattern="*2d_box.csv", recursive = T)), read_csv, show_col_types=F, col_names = c("positions", "identity", "mut", "effects", "enzyme", "type", "cond")))
+d = do.call("rbind", lapply(paste0("Pre Non-linear Transformation/Output/", list.files(path = "Pre Non-linear Transformation/Output", pattern="*2d_box.csv", recursive = T)), read_csv, show_col_types=F, col_names = c("positions", "identity", "mut", "effects", "enzyme", "type", "cond")))
 
 
 d1 = d %>% filter_all(any_vars(!is.na(.))) # removes rows with all NA before making unique ID
@@ -327,7 +334,7 @@ Load the same kind of data as d1 except that has been normalized do the $\Delta$
 
 ```{r, message=F}
 
-wt_rel_df = do.call("rbind", lapply(paste0("Output/", list.files(path = "Output", pattern="*wt_rel.csv", recursive = T)), read_csv, show_col_types=F, col_names = c("positions", "identity", "mut", "effects", "enzyme", "type", "cond")))
+wt_rel_df = do.call("rbind", lapply(paste0("Pre Non-linear Transformation/Output/", list.files(path = "Pre Non-linear Transformation/Output", pattern="*wt_rel.csv", recursive = T)), read_csv, show_col_types=F, col_names = c("positions", "identity", "mut", "effects", "enzyme", "type", "cond")))
 
 
 wt_rel_df = wt_rel_df %>% filter_all(any_vars(!is.na(.))) # removes rows with all NA before making unique ID
@@ -396,11 +403,11 @@ This gives us a quick look at the general spread of heterogenity values and thei
 
 ```{r,message=F}
 
-idio_d = do.call("rbind", lapply(paste0("Output/", list.files(path = "Output", pattern="idio_df", recursive = T)), read_csv, show_col_types=F))
+idio_d = do.call("rbind", lapply(paste0("Pre Non-linear Transformation/Output/", list.files(path = "Pre Non-linear Transformation/Output", pattern="idio_df", recursive = T)), read_csv, show_col_types=F))
 
-traj_col = sapply(str_split(list.files(path = "Output", pattern="idio_df", recursive = T), "/"),"[[",1)
+traj_col = sapply(str_split(list.files(path = "Pre Non-linear Transformation/Output", pattern="idio_df", recursive = T), "/"),"[[",1)
 
-traj_col_len = sapply(lapply(paste0("Output/", list.files(path = "Output", pattern="idio_df", recursive = T)), read_csv, show_col_types=F), dim)[1,]
+traj_col_len = sapply(lapply(paste0("Pre Non-linear Transformation/Output/", list.files(path = "Pre Non-linear Transformation/Output", pattern="idio_df", recursive = T)), read_csv, show_col_types=F), dim)[1,]
 
 traj_col_full = c()
 for(i in 1:length(traj_col)) {
@@ -582,14 +589,14 @@ idio_d %>%
 Collects all $\Delta$Function data for all orders
 
 ```{r,message=F}
-higher_order_list = list.files(path = "Output", pattern="higher_box", recursive = T)
+higher_order_list = list.files(path = "Pre Non-linear Transformation/Output", pattern="higher_box", recursive = T)
 
 higher_df = data.frame()
 for(higher_file in 1:length(higher_order_list)){
   Condition = str_split(str_split(higher_order_list[higher_file], "_")[[1]][3], "/")[[1]][1]
   Measurement = str_split(higher_order_list[higher_file], "_")[[1]][2]
   Enzyme = str_split(higher_order_list[higher_file], "_")[[1]][1]
-  appending_file = read_csv(paste0("Output/", higher_order_list[higher_file]), show_col_types=F)
+  appending_file = read_csv(paste0("Pre Non-linear Transformation/Output/", higher_order_list[higher_file]), show_col_types=F)
   appending_file$Condition = Condition
   appending_file$Measurement = Measurement
   appending_file$Enzyme = Enzyme
@@ -648,7 +655,7 @@ for(each in 1:dim(higher_all_sign_check)[1]){
 higher_all_sign_check$type = factor(types)
 ```
 
-All outputs show position/combination numbers in each category, followed by the total sum of all probed positions/combinations at that order, and finally percentages of each category
+All Pre Non-linear Transformation/Outputs show position/combination numbers in each category, followed by the total sum of all probed positions/combinations at that order, and finally percentages of each category
 
 
 ### Order 1
@@ -1168,10 +1175,10 @@ general_df %>%
 Import the absolute error files for each data set
 
 ```{r, message=F}
-all_mae = lapply(paste0("Output/", list.files(path = "Output", pattern="aic_*", recursive = T)), read_csv, skip = 1, show_col_types=F, col_names = c("MAE", "Last MAE", "Step", "Enzyme", "Linear MAE", "Linear Last MAE"))
+all_mae = lapply(paste0("Pre Non-linear Transformation/Output/", list.files(path = "Pre Non-linear Transformation/Output", pattern="aic_*", recursive = T)), read_csv, skip = 1, show_col_types=F, col_names = c("MAE", "Last MAE", "Step", "Enzyme", "Linear MAE", "Linear Last MAE"))
 
 for(element in 1:length(all_mae)){
-  all_mae[[element]]$ID = str_split(list.files(path = "Output", pattern="aic_*", recursive = T)[element], "/")[[1]][1]
+  all_mae[[element]]$ID = str_split(list.files(path = "Pre Non-linear Transformation/Output", pattern="aic_*", recursive = T)[element], "/")[[1]][1]
 }
 
 all_mae = do.call("rbind", all_mae)
@@ -1272,7 +1279,7 @@ adaptive_trajectories = c("DHFR_ki_trajg",
 Then I need to create a global trajectory data frame
 
 ```{r,message=F}
-all_traj = do.call("rbind", lapply(paste0("Output/", list.files(path = "Output", pattern="traj_epi_*", recursive = T)), read_csv, skip = 1, show_col_types=F, col_names = c("genotype", "avg", "pos", "mutations", "likely", "enzyme_name", "measure_type", "cond")))
+all_traj = do.call("rbind", lapply(paste0("Pre Non-linear Transformation/Output/", list.files(path = "Pre Non-linear Transformation/Output", pattern="traj_epi_*", recursive = T)), read_csv, skip = 1, show_col_types=F, col_names = c("genotype", "avg", "pos", "mutations", "likely", "enzyme_name", "measure_type", "cond")))
 
 all_traj = all_traj %>% unite("unique_id", c(enzyme_name, measure_type, cond), remove = F)
 
@@ -1337,7 +1344,7 @@ for(i in 1:length(adaptive_trajectories)) {
   
   file = paste0("pred_df_", suffix, "_", adaptive_trajectories[i], ".csv")
   
-  d = read_csv(paste0("Output/", adaptive_trajectories[i], "/", file), show_col_types=F)
+  d = read_csv(paste0("Pre Non-linear Transformation/Output/", adaptive_trajectories[i], "/", file), show_col_types=F)
   
   genos = str_replace_all(adaptive_traj_fave[which(adaptive_traj_fave$unique_id %in% adaptive_trajectories[i]),]$genotype, "x", "1")
   

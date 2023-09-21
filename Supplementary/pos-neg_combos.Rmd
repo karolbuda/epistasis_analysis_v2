@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 ## ✔ dplyr     1.1.3     ✔ readr     2.1.4
 ## ✔ forcats   1.0.0     ✔ stringr   1.5.0
@@ -22,12 +22,12 @@ Review no. 1 has requested that we explore the proportion of signs within each c
 
 This can be explored by quickly repeating categorization of each position, and then looking at the spread within that:
 
-```{r sign_spread, echo = F}
+```{r sign_spread}
 
-supp2 = read_xlsx("Supplementary Data 2.xlsx")
+supp2 = read_xlsx("Supplementary File 2.xlsx")
 
 supp2_spread = supp2 %>%
-  mutate(category=cut("SME", breaks=c(-Inf, log10(1/1.5), log10(1.5), Inf), labels=c("neg","neutral","pos"))) %>%
+  mutate(category=cut(SME, breaks=c(-Inf, log10(1/1.5), log10(1.5), Inf), labels=c("neg","neutral","pos"))) %>%
   group_by(`Unique ID`, category) %>%
   count(category) %>%
   pivot_wider(names_from = category, values_from = n)
@@ -135,10 +135,10 @@ It is also worth doing this for the epistatic effects in supp3
 
 ```{r show_spread_ees}
 
-supp3 = read_xlsx("Supplementary Data 3.xlsx")
+supp3 = read_xlsx("Supplementary File 3.xlsx")
 
 supp3_spread = supp3 %>%
-  mutate(category=cut("Epistasis", breaks=c(-Inf, log10(1/1.5), log10(1.5), Inf), labels=c("neg","neutral","pos"))) %>%
+  mutate(category=cut(Epistasis, breaks=c(-Inf, log10(1/1.5), log10(1.5), Inf), labels=c("neg","neutral","pos"))) %>%
   group_by(`Unique ID`, Order, category) %>%
   count(category) %>%
   pivot_wider(names_from = category, values_from = n)

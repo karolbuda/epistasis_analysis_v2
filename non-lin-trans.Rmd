@@ -50,7 +50,7 @@ merge_csv_files <- function(directory, pattern, columns_to_extract) {
 }
 
 # Specify the directory, pattern, and columns to extract
-directory <- "./../Output"
+directory <- "./Pre Non-linear Transformation/Output"
 pattern <- "pred_df*"
 columns_to_extract <- c("observed effect", "average effect", "WT effect")
 
@@ -446,7 +446,7 @@ transform_run <- function(directory, pattern, columns_to_extract) {
 
 ## Run 
 
-directory <- "./../Output"
+directory <- "./Pre Non-linear Transformation/Output"
 pattern <- "pred_df*"
 columns_to_extract <- c("genotype", "observed effect", "average effect")
 

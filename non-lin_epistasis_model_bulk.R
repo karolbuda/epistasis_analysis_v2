@@ -21,7 +21,7 @@ updater = F
 
 ### Inputs ###
 
-inputs = list.files("./Non-linear Transformation/trans_Input")
+inputs = list.files("./trans_Input")
 
 # Constants
 
@@ -36,7 +36,7 @@ par(family = "sans")
 
 data_loading = function() {
   
-  d = read.csv(paste("Non-linear Transformation/trans_Input/", file, sep = ""))
+  d = read.csv(paste("trans_Input/", file, sep = ""))
   data = d[5:dim(d)[1],1:2]
   
   codes = data.frame()
@@ -1159,7 +1159,7 @@ higher_order_box = function() {
 for(cur_input in 1:length(inputs)) {
   file = inputs[cur_input]
   
-  if(dir.exists(paste(c("Non-linear Transformation/trans_Output/", str_remove(file, ".csv")), collapse = "")) & !updater) {
+  if(dir.exists(paste(c("trans_Output/", str_remove(file, ".csv")), collapse = "")) & !updater) {
     next
   }
   
@@ -1168,10 +1168,10 @@ for(cur_input in 1:length(inputs)) {
   cond = str_split(str_remove(file, ".csv"), "_")[[1]][3]
   
   outputs = data_loading()
-  if(!dir.exists(paste(c("Non-linear Transformation/trans_Output/", str_remove(file, ".csv")), collapse = ""))) {
-    dir.create(paste(c("Non-linear Transformation/trans_Output/", str_remove(file, ".csv")), collapse = ""))
+  if(!dir.exists(paste(c("trans_Output/", str_remove(file, ".csv")), collapse = ""))) {
+    dir.create(paste(c("trans_Output/", str_remove(file, ".csv")), collapse = ""))
   }
-  setwd(paste(c("Non-linear Transformation/trans_Output/", str_remove(file, ".csv")), collapse = ""))
+  setwd(paste(c("trans_Output/", str_remove(file, ".csv")), collapse = ""))
   epistasis_analysis()
   blanket_analysis()
   network_analysis()
