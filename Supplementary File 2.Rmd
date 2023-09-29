@@ -1,0 +1,239 @@
+---
+title: "Supplementary File 2"
+output:
+  html_document: default
+---
+
+```{r, setup, include=FALSE}
+# R 4.1.2
+
+# Load the required libraries
+library(tidyverse)
+## ✔ dplyr     1.1.3     ✔ readr     2.1.4
+## ✔ forcats   1.0.0     ✔ stringr   1.5.0
+## ✔ ggplot2   3.4.3     ✔ tibble    3.2.1
+## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+## ✔ purrr     1.0.2 
+library(splines) # 4.1.2
+library(mgcv) # 1.8.42
+library(knitr) # 1.43
+library(minpack.lm) # 1.2.3
+```
+
+The following analysis outlines the exploration of putative non-linear transformations, then details how the four-parameter transform was utilized.
+
+```{r data_loading, include=F, echo=F, message=F, warning=F}
+
+# Define a function to merge CSV files
+merge_csv_files <- function(directory, pattern, columns_to_extract) {
+  # Get a list of CSV files matching the pattern in the specified directory
+  csv_files <- list.files(directory, recursive = TRUE, pattern = pattern, full.names = TRUE)
+  
+  # Read and extract specific columns from each CSV file
+  data_list <- map(csv_files, ~{
+    data <- read_csv(.x, show_col_types = FALSE)
+    file_name <- gsub("pred_df_", "", basename(.x))  # Remove specified pattern
+    file_name <- gsub("\\.csv$", "", file_name)  # Remove ".csv" extension
+    data$file_name <- file_name  # Add a new column with the modified file name
+    data <- data %>% select(file_name, {{ columns_to_extract }}) # This is now depricated and I should use all_of()?
+    return(data)
+  })
+  
+  # Combine the extracted data frames into a single tibble
+  merged_data <- bind_rows(data_list)
+  
+  return(merged_data)
+}
+
+# Specify the directory, pattern, and columns to extract
+directory <- "./Pre Non-linear Transformation/Output"
+pattern <- "pred_df*"
+columns_to_extract <- c("observed effect", "average effect", "WT effect")
+
+# Call the function to merge the CSV files
+result_tibble <- merge_csv_files(directory, pattern, columns_to_extract)
+
+# Trim the file_name to unique_id
+result_tibble <- result_tibble %>%
+  mutate(unique_id = str_split(file_name, "_")) %>%
+  mutate(unique_id = map_chr(unique_id, ~paste(tail(na.omit(.), 3), collapse = "_"))) %>%
+  select(-file_name)
+
+colnames(result_tibble) <- c("observed_effect", "average_effect", "wt_effect", "unique_id")
+
+# View the resulting tibble
+knitr::kable(head(result_tibble), format = "markdown")
+```
+
+### Non-linear transformation evaluation
+
+#### Assessing degrees for splines
+
+We began by evaluating the use of cubic splines with a penalty score encouraging monotonicity using a general additive model in the ```mgcv``` package. We iteratively increased the number of degrees from 1-5, and evaluated the fits using AIC to select the strongest model for each landscape, then logged the number of degrees that should be used for each transform.
+
+```{r mono_spline, echo=F, message=F, warning=F}
+# Define a range of degrees for the spline transformation
+degrees <- seq(1, 5, by = 1)
+
+# Create a function to perform the monotonic spline analysis for each unique_id
+monotonic_spline_analysis <- function(data) {
+  results <- data.frame(Degree = numeric(0), AIC = numeric(0))
+  
+  for (degree in degrees) {
+    
+    spline_result <- gam(observed_effect ~ s(average_effect, bs = "cr", k = degree, m = 1), data = data)
+    
+    # Extract AIC from the result
+    AIC_value <- AIC(spline_result)
+    
+    results <- rbind(results, data.frame(Degree = degree, AIC = AIC_value))
+  }
+  
+  best_degree <- results$Degree[which.min(results$AIC)]
+  best_AIC <- results$AIC[which.min(results$AIC)]
+  
+  return(data.frame(Unique_ID = unique(data$unique_id), Best_Degree = best_degree, Best_AIC = best_AIC))
+}
+
+# Perform monotonic spline analysis for each unique_id using group_split
+results_list_monotonic <- result_tibble %>%
+  group_split(unique_id) %>%
+  map_df(~ monotonic_spline_analysis(.))
+```
+
+#### Visual spline model evaluation
+
+We then visually evaluated the cubic spline transformations (in blue) for each landscape with the x-axis representing additive effects, as predicted by the first-order background-averaged model, and the y-axis representing observed effects.
+
+```{r plotting_mono_transform, echo=F, message=F, warning=F}
+
+# Create a function to perform the cubic spline transformation and create a plot
+cubic_spline_plot <- function(data, best_degree, sample_id) {
+  # Modify the formula to include best_degree as a predictor
+  formula <- as.formula(paste("observed_effect ~ bs(average_effect, degree =", best_degree, ")"))
+  
+  # Perform the cubic spline transformation
+  spline_model <- gam(formula, data = data)
+  
+  # Predict the transformed values
+  predicted_values <- predict(spline_model, newdata = data)
+  
+  # Create a data frame for the plot
+  plot_data <- tibble(average_effect = data$average_effect, 
+                      observed_effect = data$observed_effect, 
+                      Predicted = predicted_values)
+  
+  # Create the plot using ggplot2
+  ggplot(plot_data, aes(x = average_effect, y = observed_effect)) +
+    geom_point() +                # Scatterplot of observed data
+    geom_line(aes(y = Predicted), color = "blue") +  # Line for transformed values
+    labs(title = paste("Cubic Spline Transformation of", sample_id, "(Degree =", best_degree, ")"),
+         x = "Additive Effect",
+         y = "Observed Effect") +
+    theme_classic() +  # Use classic theme
+    theme(
+      text = element_text(family = "Arial"),  # Change font to Arial
+      plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),  # Title customization
+      axis.title = element_text(size = 12),  # Axis label customization
+      axis.text = element_text(size = 10),  # Axis text size
+      legend.position = "none"  # Remove legend
+    )
+}
+
+# Iterate over each unique_id in results_list_monotonic and create a plot for each best_degree
+for (i in seq_along(results_list_monotonic$Unique_ID)) {
+  sample_id <- results_list_monotonic$Unique_ID[i]
+  sample_data <- result_tibble %>% filter(unique_id == sample_id)
+  best_degree <- results_list_monotonic$Best_Degree[i]
+  
+  # Create and display the plot
+  plot <- cubic_spline_plot(sample_data, best_degree, sample_id)
+  print(plot)
+}
+
+```
+
+From the fits we notice a certain degree of over fitting. One approach to alleviate this would be to arbitrarily lower the number of degrees, however instead we opted to use a different transformation method which is less prone to over fitting.
+
+***
+
+#### Evaluation of four parameter transformations
+
+The drawback of using monotonic splines (or even power transforms), as can be seen from the plots above, is the lack of bounding. Bounding is crucial to avoid greatly transforming phenotype values that lay outside of the bounds of the transform, which itself is constrained by the range of the predicted first-order effects.
+
+In other words, phenotypes with magnitudes that lay outside of the range of predicted values by the first-order model are at risk of being incorrectly transformed. Though this is somewhat true for a four-parameter model, the bounded upper- and lower- thresholds ensure that phenotypes that lay outside of the predicted range are likely restricted to the upper and lower bounds.
+
+#### Four parameter function transform
+
+We attempted to transform all datasets using the four-parameter function, with fitting performed by non-linear least squares regression using ```nlsLM```. The fits are compared to a simple linear model fit using an AIC to determine whether the additional information stemming from the four-parameter transform is parsimonious, otherwise, no transform is applied.
+
+```{r four_param_trans_plot, echo = F, message = F, warning = F, error = F}
+# Create a function to perform the cubic spline transformation and create a plot
+four_parameter_transform_plot <- function(data, sample_id) {
+ 
+  four_parameter_function <- function(upper, lower, mid, slope, x) {
+    return(upper - ( (upper - lower) ) / (1 + exp( (mid-x) * slope ) ) )
+  }
+  
+  # Fit a standard linear model
+  linear_model <- lm(observed_effect ~ average_effect, data = data)
+  
+  # Fit the sigmoid model
+  four_parameter_model <- try(nlsLM(observed_effect ~ four_parameter_function(upper, lower, mid, slope, average_effect),
+                                data = data,
+                                start = c(upper=max(data$average_effect), lower=min(data$average_effect), 
+                                          mid = data$average_effect[ceiling(length(data$average_effect)/2)], slope = 1),
+                                control = list(maxiter = 500)))
+  
+
+  if(class(four_parameter_model) != "try-error") {
+    if(AIC(four_parameter_model) < AIC(linear_model)){
+      # Predict the transformed values
+      predicted_values <- predict(four_parameter_model, newdata = data)
+      used_model = "Four-parameter"
+    } else {
+      predicted_values <- predict(linear_model, newdata = data)
+      used_model = "Linear"
+    }
+  } else {
+    #four_parameter_model has failed to fit or it is inferior to linear and we don't transform the data
+    predicted_values <- predict(linear_model, newdata = data)
+    used_model = "Linear"
+  }
+  
+  # Create a data frame for the plot
+  plot_data <- tibble(average_effect = data$average_effect, 
+                      observed_effect = data$observed_effect, 
+                      Predicted = predicted_values)
+  
+  # Create the plot
+  ggplot(plot_data, aes(x = average_effect, y = observed_effect)) +
+    geom_point() +                # Scatterplot of observed data
+    geom_line(aes(y = Predicted), color = "blue") +  # Line for transformed values
+    labs(title = paste(used_model, "Transformation of", sample_id),
+         x = "Additive Effect",
+         y = "Observed Effect") +
+    theme_classic() +  # Use classic theme
+    theme(
+      text = element_text(family = "Arial"),  # Change font to Arial
+      plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),  # Title customization
+      axis.title = element_text(size = 12),  # Axis label customization
+      axis.text = element_text(size = 10),  # Axis text size
+      legend.position = "none"  # Remove legend
+    )
+}
+
+# Iterate over each distinct unique_id in result_tibble and create a plot for each best_degree
+for (i in seq_along(unique(result_tibble$unique_id))) {
+  
+  sample_id <- unique(result_tibble$unique_id)[i]
+  sample_data <- result_tibble %>% filter(unique_id == sample_id)
+  
+  # Create and display the plot
+  plot <- four_parameter_transform_plot(sample_data, sample_id)
+  print(plot)
+}
+
+```
+
+Indeed, these fits appear much better visually than the spline fits, as they avoid over fitting to the datasets. We used these transforms in the subsequent analyses. Note: we removed landscapes TEM_growth_AMP, TEM_growth_AMC, TEM_growth_CAZ, and TEM_growth_TZP, as the four-parameter model was more parsimonious than the linear model, however the fits reduced all values in the landscape to binary values that represented the upper or lower bounds of the four-parameter model.
