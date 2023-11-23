@@ -427,7 +427,7 @@ Histogram to show heterogenity at Orders 2, 3, and 4 with the log10 1.5-fold sig
 idio_d_plot_2 = idio_d %>%
   filter(mutations == "Order 2") %>%
   ggplot(aes(x = idiosync)) +
-  geom_histogram(fill = "#edae49", color = "black", lwd = 0.1) +
+  geom_histogram(binwidth = 0.08, fill = "#edae49", color = "black", lwd = 0.1) +
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
@@ -447,7 +447,7 @@ idio_d_plot_2
 idio_d_plot_3 = idio_d %>%
   filter(mutations == "Order 3") %>%
   ggplot(aes(x = idiosync)) +
-  geom_histogram(fill = "#edae49", color = "black", lwd = 0.1) +
+  geom_histogram(binwidth = 0.08, fill = "#edae49", color = "black", lwd = 0.1) +
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
@@ -468,7 +468,7 @@ idio_d_plot_3
 idio_d_plot_4 = idio_d %>%
   filter(mutations == "Order 4") %>%
   ggplot(aes(x = idiosync)) +
-  geom_histogram(fill = "#edae49", color = "black", lwd = 0.1) +
+  geom_histogram(binwidth = 0.08, fill = "#edae49", color = "black", lwd = 0.1) +
   geom_vline(xintercept = log10(1.5), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(2), lty = 2, lwd = 0.2) +
   geom_vline(xintercept = log10(5), lty = 2, lwd = 0.2) +
